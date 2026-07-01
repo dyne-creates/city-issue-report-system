@@ -26,6 +26,15 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'contact_number' => [
+                'required',
+                'string',
+                'max:11',
+            ],
+            'barangay_id' => [
+                'required',
+                'exists:barangays,id',
+            ],
         ];
     }
 }

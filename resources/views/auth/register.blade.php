@@ -16,6 +16,31 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
+        <!-- Contact Number -->
+        <div class="mt-4">
+            <x-input-label for="contact_number" :value="__('Contact Number')" />
+            <x-text-input id="contact_number" class="block mt-1 w-full" type="text" name="contact_number" :value="old('contact_number')" required autocomplete="tel" />
+            <x-input-error :messages="$errors->get('contact_number')" class="mt-2" />
+        </div>
+
+        <!-- Barangay -->
+        <div class="mt-4">
+            <x-input-label for="barangay_id" :value="__('Barangay')" />
+        
+            <select id="barangay_id" name="barangay_id" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                <option value="">Select your barangay</option>
+        
+                @foreach ($barangays as $barangay)
+                    <option value="{{ $barangay->id }}"
+                        {{ old('barangay_id') == $barangay->id ? 'selected' : '' }}>
+                        {{ $barangay->name }}
+                    </option>
+                @endforeach
+            </select>
+        
+            <x-input-error :messages="$errors->get('barangay_id')" class="mt-2" />
+        </div>
+
         <!-- Password -->
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />
