@@ -28,7 +28,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-<<<<<<< HEAD
         if(Auth::user()->role == 'admin'){
             return redirect(route('admin.dashboard'));
         } elseif (Auth::user()->role == 'staff') {
@@ -36,11 +35,6 @@ class AuthenticatedSessionController extends Controller
         }
 
         return redirect()->intended(route('citizen.dashboard', absolute: false));
-=======
-        
-
-        return redirect()->intended(route('dashboard', absolute: false));
->>>>>>> d97a5ac3780dcf270d7a5b2cc879f28b8a482c15
     }
 
     /**
