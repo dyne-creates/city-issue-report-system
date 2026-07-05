@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,9 +21,7 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        $barangays = DB::table('barangays')->orderBy('name')->get();
-
-        return view('auth.register', compact('barangays'));
+        return view('auth.register');
     }
 
     /**
@@ -33,10 +32,8 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:150'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:150', 'unique:users,email'],
-            'contact_number' => ['required', 'string', 'max:20'],
-            'barangay_id' => ['required', 'exists:barangays,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -46,9 +43,6 @@ class RegisteredUserController extends Controller
             'contact_number' => $request->contact_number,
             'barangay_id' => $request->barangay_id,
             'password' => Hash::make($request->password),
-            'role' => 'citizen',
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
 
         Auth::loginUsingId($userId);
