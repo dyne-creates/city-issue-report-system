@@ -23,3 +23,10 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+<IfModule mod_php.c>
+    php_value upload_tmp_dir "C:/Users/Dwayne/Desktop/city-issue-app/storage/framework/uploads"
+    php_value sys_temp_dir "C:/Users/Dwayne/Desktop/city-issue-app/storage/framework/uploads"
+    php_value upload_max_filesize 40M
+    php_value post_max_size 40M
+</IfModule>

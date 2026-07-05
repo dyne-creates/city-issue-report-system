@@ -48,18 +48,12 @@ return new class extends Migration
             // old_status is nullable: the first log entry (when issue is created)
             // has no previous status — null represents the "initial" state.
             $table->enum('old_status', [
-                'reported',
-                'verified',
-                'in_progress',
-                'completed',
+                'reported', 'verified', 'in_progress', 'completed',
             ])->nullable();
 
             // The status that was set during this change
             $table->enum('new_status', [
-                'reported',
-                'verified',
-                'in_progress',
-                'completed',
+                'reported', 'verified', 'in_progress', 'completed',
             ]);
 
             // Optional notes from staff explaining the status change

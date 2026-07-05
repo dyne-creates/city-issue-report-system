@@ -20,10 +20,18 @@ return new class extends Migration
                   ->constrained('barangays')
                   ->restrictOnDelete()
                   ->restrictOnUpdate();
+                  
+            // One Staff belongs to only one department
+            // Nullable: admin and citizen isn't required to have it
+            $table->foreignId('department_id')
+                  ->nullable()
+                  ->constrained('departments')
+                  ->restrictOnDelete()
+                  ->restrictOnUpdate();
  
             $table->string('name', 150);
- 
             $table->string('email', 150)->unique();     // used for login
+            
             $table->timestamp('email_verified_at')->nullable(); // Laravel default
  
             $table->string('password');                 // bcrypt hashed
@@ -34,7 +42,7 @@ return new class extends Migration
             //   admin   — full access including file maintenance and reports
             $table->enum('role', ['citizen', 'staff', 'admin'])->default('citizen');
  
-            $table->string('contact_number', 20)->nullable();
+            $table->string('contact_number', 11)->nullable();
  
             $table->rememberToken();    // for "remember me" sessions (Laravel standard)
             $table->timestamps();

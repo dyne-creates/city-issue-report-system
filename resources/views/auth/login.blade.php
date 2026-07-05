@@ -1,4 +1,10 @@
 <x-guest-layout>
+    <div class="mb-3">
+        <a href="{{ url('/') }}"
+           class="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+            ← Back to Home
+        </a>
+    </div>
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
@@ -38,7 +44,7 @@
                     {{ __('Forgot your password?') }}
                 </a>
             @endif
-
+                
             <x-primary-button class="ms-3">
                 {{ __('Log in') }}
             </x-primary-button>

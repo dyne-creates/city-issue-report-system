@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateBarangayRequest extends FormRequest
 {
@@ -12,7 +13,7 @@ class UpdateBarangayRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,8 +23,16 @@ class UpdateBarangayRequest extends FormRequest
      */
     public function rules(): array
     {
+        $barangay = $this->route('barangay');
+        $barangayId = is_object($barangay) ? $barangay->id : $barangay;
+
         return [
-            //
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('barangays', 'name')->ignore($barangayId),
+            ],
         ];
     }
 }

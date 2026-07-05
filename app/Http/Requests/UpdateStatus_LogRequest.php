@@ -12,7 +12,7 @@ class UpdateStatus_LogRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +23,11 @@ class UpdateStatus_LogRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'issue_id' => ['required', 'integer', 'exists:issues,id'],
+            'changed_by' => ['required', 'integer', 'exists:users,id'],
+            'old_status' => ['nullable', 'in:reported,verified,in_progress,completed'],
+            'new_status' => ['required', 'in:reported,verified,in_progress,completed'],
+            'remarks' => ['nullable', 'string'],
         ];
     }
 }

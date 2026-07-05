@@ -60,10 +60,7 @@ return new class extends Migration
             // 'in_progress' — staff/department is actively working on it
             // 'completed'   — issue has been resolved
             $table->enum('status', [
-                'reported',
-                'verified',
-                'in_progress',
-                'completed',
+                'reported', 'verified', 'in_progress', 'completed',
             ])->default('reported');
 
             // Relative file path stored in storage/app/public
