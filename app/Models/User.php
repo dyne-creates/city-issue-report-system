@@ -13,11 +13,8 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /*
-    |--------------------------------------------------------------------------
-    | Role constants
-    |--------------------------------------------------------------------------
-    | Mirrors the `role` enum on the users table. Used instead of raw
-    | strings throughout the app to avoid typos in role checks.
+       Role constants
+       Mirrors the `role` enum on the users table. Used instead of raw strings throughout the app to avoid typos in role checks
     */
     public const ROLE_CITIZEN = 'citizen';
     public const ROLE_STAFF   = 'staff';
@@ -59,13 +56,11 @@ class User extends Authenticatable
     ];
 
     /*
-    |--------------------------------------------------------------------------
     | Relationships
-    |--------------------------------------------------------------------------
     */
 
     /**
-     * Barangay this user belongs to (nullable for staff/admin).
+     * kung san nakatira ung citizen (nullable on admin/staff)
      */
     public function barangay(): BelongsTo
     {
@@ -73,7 +68,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Issues filed by this user (as the reporting citizen).
+     * issue(s) na nireport ni user
      */
     public function issues(): HasMany
     {
@@ -81,8 +76,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Status log entries this user authored, i.e. status changes
-     * this user made on issues (status_logs.changed_by).
+     * Status log entries this user authored, i.e. status changes this user made on issues (status_logs.changed_by).
      */
     public function statusLogs(): HasMany
     {
@@ -90,9 +84,7 @@ class User extends Authenticatable
     }
 
     /*
-    |--------------------------------------------------------------------------
-    | Role helpers
-    |--------------------------------------------------------------------------
+    | Role helpers, para kung citizen ka, citizen ka 
     */
 
     public function isCitizen(): bool

@@ -9,14 +9,14 @@ return new class extends Migration
     /**
      * Run the migrations.
      *
-     * barangays — geographic unit for citizens and issue locations.
-     * No foreign keys — this is a root/anchor table.
+     * barangays - for citizens and issue locations
+     * No foreign keys - this is a root/anchor table
      */
     public function up(): void
     {
         Schema::create('barangays', function (Blueprint $table) {
-            $table->id();                           // bigint unsigned AUTO_INCREMENT PK
-            $table->string('name', 100)->unique();  // barangay name, must be unique
+            $table->id();                           
+            $table->string('name', 100)->unique();  // barangay must not have a duplicate
             $table->timestamps();                   // created_at, updated_at
         });
     }

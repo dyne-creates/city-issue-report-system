@@ -60,11 +60,8 @@ Route::middleware('auth')->group(function () {
 
         return Storage::disk('public')->response($issueRecord->photo_path);
     })->name('issue.photo');
-});
 
-require __DIR__ . '/auth.php';
-
-// citizen routes
+    // citizen routes
 Route::middleware(['auth', 'citizenMiddleware'])
     ->prefix('citizen')
     ->name('citizen.') // Added a dot here for clean naming (e.g., citizen.dashboard)
@@ -73,7 +70,7 @@ Route::middleware(['auth', 'citizenMiddleware'])
         Route::get('dashboard', [CitizenDashboardController::class, 'index'])->name('dashboard');
         Route::post('issues/search', [CitizenIssueController::class, 'search'])->name('issues.search');
         Route::get('issues/search/reset', [CitizenIssueController::class, 'resetSearch'])->name('issues.search.reset');
-        Route::resource('issues', CitizenIssueController::class)->only(['index', 'create', 'store', 'show']);
+        Route::resource('issues', CitizenIssueController::class);
     });
 
 // staff routes
@@ -102,3 +99,8 @@ Route::middleware(['auth', 'adminMiddleware'])
         Route::resource('issues', AdminIssueController::class);
         Route::resource('reports', ReportController::class);
     });
+
+});
+
+require __DIR__ . '/auth.php';
+

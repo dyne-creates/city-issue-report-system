@@ -10,7 +10,6 @@
             <div
                 class="relative bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-2xl border border-violet-100 dark:border-gray-700">
 
-                {{-- purple top accent --}}
                 <div class="h-1 w-full bg-gradient-to-r from-violet-600 to-purple-600"></div>
 
                 <div class="p-6 text-gray-900 dark:text-gray-100">
@@ -28,9 +27,13 @@
                     <!-- Modification Form -->
                     <form action="{{ route('admin.departments.update', $department->id) }}" method="POST"
                         class="space-y-6 max-w-xl">
+                        
                         @csrf
                         @method('PUT') {{-- Required method spoofing for Laravel update resources --}}
 
+                        <input type="hidden" name="page" value="{{ request('page') }}">
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                        
                         <!-- Department Name Field Input Group -->
                         <div>
                             <x-input-label for="name" :value="__('Department Name')" />

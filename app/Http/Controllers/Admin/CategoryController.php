@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 use App\Models\Category;
 use App\Models\Department;
+
 class CategoryController extends Controller
 {
     /**
@@ -30,9 +31,9 @@ class CategoryController extends Controller
         // search filter for category and department (input)
         if ($request->filled('search')) {
             $query->where(function ($query) use ($request) {
-                $query->where('categories.name', 'like', '%'.$request->search.'%')
-                    ->orWhere('categories.description', 'like', '%'.$request->search.'%')
-                    ->orWhere('departments.name', 'like', '%'.$request->search.'%');
+                $query->where('categories.name', 'like', '%' . $request->search . '%')
+                    ->orWhere('categories.description', 'like', '%' . $request->search . '%')
+                    ->orWhere('departments.name', 'like', '%' . $request->search . '%');
             });
         }
         // search by department
@@ -73,9 +74,7 @@ class CategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-    }
+    public function show(string $id) {}
 
     /**
      * Show the form for editing the specified resource.
@@ -83,6 +82,7 @@ class CategoryController extends Controller
     public function edit(Category $category)
     {
         $departments = Department::all();
+
         return view('admin.categories.edit', compact('category', 'departments'));
     }
 
@@ -93,18 +93,38 @@ class CategoryController extends Controller
     {
         $category->update($request->validated());
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category updated successfully.');
+        return redirect()->route('admin.categories.index', $request->only('page', 'search'))
+            ->with('success', 'Category updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Category $category)
+    public function destroy(Category $category, Request $request)
     {
         try {
             $category->delete();
-            return redirect()->route('admin.categories.index')
-                ->with('success', 'Category deleted successfully.');
+
+            $page = max((int) $request->page, 1);
+
+            $query = Category::query();
+
+            if ($request->filled('search')) {
+                $query->where('name', 'like', '%' . $request->search . '%');
+            }
+
+            $total = $query->count();
+
+            $lastPage = max((int) ceil($total / 10), 1);
+
+            if ($page > $lastPage) {
+                $page = $lastPage;
+            }
+
+            return redirect()->route('admin.categories.index', [
+                'page' => $page,
+                'search' => $request->search,
+            ])->with('success', 'Category deleted successfully.');
         } catch (QueryException) {
             return redirect()->route('admin.categories.index')
                 ->with('error', 'Category cannot be deleted because it is still being used.');

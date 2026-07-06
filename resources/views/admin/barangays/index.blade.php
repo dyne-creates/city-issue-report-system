@@ -71,70 +71,77 @@
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                 @forelse ($barangays as $barangay)
-                                    <tr
-                                        class="bg-white dark:bg-gray-800 hover:bg-violet-50/40 dark:hover:bg-gray-700/50 transition-colors">
-                                        <!-- Check object syntax or array fallback cleanly -->
-                                        <td class="py-4 px-6 font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                                            {{ $barangay->name }}
-                                        </td>
-                                        <td class="py-4 px-6 text-center">
-                                            <div class="flex justify-center items-center gap-3">
-                                                <!-- Edit Button -->
-                                                <a href="{{ route('admin.barangays.edit', $barangay->id) }}"
-                                                    class="text-sm font-medium text-amber-600 dark:text-amber-400 hover:underline">
-                                                    Edit
-                                                </a>
+                                                                <tr
+                                                                    class="bg-white dark:bg-gray-800 hover:bg-violet-50/40 dark:hover:bg-gray-700/50 transition-colors">
+                                                                    <!-- Check object syntax or array fallback cleanly -->
+                                                                    <td class="py-4 px-6 font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                                                                        {{ $barangay->name }}
+                                                                    </td>
+                                                                    <td class="py-4 px-6 text-center">
+                                                                        <div class="flex justify-center items-center gap-3">
+                                                                            <!-- Edit Button -->
+                                                                            <a href="{{ route('admin.barangays.edit', [
+                                                                                    'barangay' => $barangay->id,
+                                                                                    'page' => request('page'),
+                                                                                    'search' => request('search'),
+                                                                                ]) }}" class="text-sm font-medium text-amber-600 dark:text-amber-400 hover:underline">
+                                                                                Edit
+                                                                            </a>
 
-                                                <!-- Delete Button Form -->
-                                                <form action="{{ route('admin.barangays.destroy', $barangay->id) }}"
-                                                    method="POST" x-data="{ open: false }" class="inline">
-                                                    @csrf
-                                                    @method('DELETE')
+                                                                            <!-- Delete Button Form -->
+                                                                            <form action="{{ route('admin.barangays.destroy', $barangay->id) }}"
+                                                                                method="POST" x-data="{ open: false }" class="inline">
 
-                                                    <button type="button" @click="open = true"
-                                                        class="text-sm font-medium text-red-600 hover:text-red-700 hover:underline">
-                                                        Delete
-                                                    </button>
+                                                                                @csrf
+                                                                                @method('DELETE')
 
-                                                    {{-- Alert Pop up --}}
-                                                    <div x-show="open" x-transition
-                                                        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-                                                        style="display: none;">
+                                                                                    <input type="hidden" name="page" value="{{ request('page') }}">
+                                                                                    <input type="hidden" name="search" value="{{ request('search') }}">
 
-                                                        <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+                                                                                <button type="button" @click="open = true"
+                                                                                    class="text-sm font-medium text-red-600 hover:text-red-700 hover:underline">
+                                                                                    Delete
+                                                                                </button>
 
-                                                            {{-- Title --}}
-                                                            <h2 class="text-lg font-semibold text-slate-800">
-                                                                Delete Barangay {{ $barangay->name }}
-                                                            </h2>
+                                                                                {{-- Alert Pop up --}}
+                                                                                <div x-show="open" x-transition
+                                                                                    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+                                                                                    style="display: none;">
 
-                                                            {{-- Message --}}
-                                                            <p class="mt-2 text-sm text-slate-600">
-                                                                Are you sure you want to delete this barangay?
-                                                                This action cannot be undone.
-                                                            </p>
+                                                                                    <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
 
-                                                            {{-- Actions --}}
-                                                            <div class="mt-6 flex justify-end gap-3">
+                                                                                        {{-- Title --}}
+                                                                                        <h2 class="text-lg font-semibold text-slate-800">
+                                                                                            Delete Barangay {{ $barangay->name }}
+                                                                                        </h2>
 
-                                                                <button type="button" @click="open = false"
-                                                                    class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
-                                                                    Cancel
-                                                                </button>
+                                                                                        {{-- Message --}}
+                                                                                        <p class="mt-2 text-sm text-slate-600">
+                                                                                            Are you sure you want to delete this barangay?
+                                                                                            This action cannot be undone.
+                                                                                        </p>
 
-                                                                <button type="submit"
-                                                                    class="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">
-                                                                    Delete
-                                                                </button>
+                                                                                        {{-- Actions --}}
+                                                                                        <div class="mt-6 flex justify-end gap-3">
 
-                                                            </div>
+                                                                                            <button type="button" @click="open = false"
+                                                                                                class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+                                                                                                Cancel
+                                                                                            </button>
 
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                                                                            <button type="submit"
+                                                                                                class="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">
+                                                                                                Delete
+                                                                                            </button>
+
+                                                                                        </div>
+
+                                                                                    </div>
+                                                                                </div>
+                                                                            </form>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
                                 @empty
                                     <!-- Fallback template when rows are missing -->
                                     <tr>

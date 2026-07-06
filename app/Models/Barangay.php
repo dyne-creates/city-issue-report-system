@@ -20,9 +20,7 @@ class Barangay extends Model
     ];
 
     /*
-    |--------------------------------------------------------------------------
     | Relationships
-    |--------------------------------------------------------------------------
     */
 
     /**
@@ -35,7 +33,7 @@ class Barangay extends Model
     }
 
     /**
-     * Issues geographically located in this barangay.
+     * Issues located in this barangay.
      */
     public function issues(): HasMany
     {

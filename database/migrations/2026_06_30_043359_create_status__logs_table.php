@@ -9,19 +9,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      *
-     * status_logs — immutable audit trail of every status change on an issue.
+     * status_logs - immutable audit trail of every status change on an issue.
      * Every time an issue's status is updated, a new row is inserted here.
-     * This table is NEVER updated — only appended to.
      *
-     * This table powers:
+     *  -- this is for
      *   - Transaction history (visible to both citizen and staff)
      *   - Report generation (resolution times, status distribution)
      *   - Accountability (who changed what, when, with what remarks)
      *
      * Referential integrity:
      *   issue_id   → CASCADE delete
-     *     If an issue is deleted (rare, admin action), its logs go with it.
-     *     Logs without an issue are meaningless orphans.
+     *     If an issue is deleted, its logs go with it.
+     *     Logs without an issue are meaningless.
      *
      *   changed_by → RESTRICT delete
      *     Do not allow deleting a user who has changed issue statuses.

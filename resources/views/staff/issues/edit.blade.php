@@ -43,7 +43,7 @@
 
                             <div>
                                 <dt class="font-semibold text-gray-500 dark:text-gray-400">Reported</dt>
-                                <dd>{{ $issue->created_at }}</dd>
+                                <dd>{{ \Carbon\Carbon::parse($issue->created_at)->format('F d, Y h:i A') }}</dd>
                             </div>
 
                         </dl>
@@ -76,6 +76,7 @@
 
                                     @foreach ($statuses as $status)
                                         <option value="{{ $status }}" {{ old('status', $issue->status) === $status ? 'selected' : '' }}>
+                                            {{-- to display the old and new status in a readable format --}}
                                             {{ \Illuminate\Support\Str::headline($status) }}
                                         </option>
                                     @endforeach
@@ -109,8 +110,7 @@
                 </div>
 
                 {{-- HISTORY --}}
-                <div
-                    class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border-t-4 border-violet-500">
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border-t-4 border-violet-500">
 
                     <div class="p-6">
                         <h3 class="text-lg font-medium mb-4">Status History</h3>
@@ -120,18 +120,20 @@
                             @forelse ($statusLogs as $log)
                                 <div class="border-l-4 border-violet-500 pl-4">
 
-                                    <p class="text-sm font-semibold">
+                                    <p class="text-sm font-semibold text-gray-900 dark:text-white">
                                         {{ \Illuminate\Support\Str::headline($log->old_status ?? 'initial') }}
                                         →
                                         {{ \Illuminate\Support\Str::headline($log->new_status) }}
                                     </p>
 
                                     <p class="text-xs text-gray-500">
-                                        {{ $log->changed_by_name }} - {{ $log->created_at }}
+                                        {{ $log->changed_by_display }} • {{ \Carbon\Carbon::parse($log->created_at)->format('F d, Y h:i A') }}
                                     </p>
 
                                     @if ($log->remarks)
-                                        <p class="text-sm mt-1">{{ $log->remarks }}</p>
+                                        <p class="text-sm mt-1 text-gray-700 dark:text-gray-300">
+                                            {{ $log->remarks }}
+                                        </p>
                                     @endif
 
                                 </div>
@@ -141,6 +143,7 @@
 
                         </div>
                     </div>
+                </div>
 
                 </div>
 

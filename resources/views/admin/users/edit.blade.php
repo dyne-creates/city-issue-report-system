@@ -20,11 +20,14 @@
                             current password.</p>
                     </div>
 
-                    <form action="{{ route('admin.users.update', $user->id) }}" method="POST"
-                        class="space-y-6 max-w-2xl">
+                    <form action="{{ route('admin.users.update', $user->id) }}" method="POST" class="space-y-6 max-w-2xl">
+                        
                         @csrf
                         @method('PUT')
 
+                        <input type="hidden" name="page" value="{{ request('page') }}">
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                        
                         <div>
                             <x-input-label for="name" :value="__('Name')" />
                             <x-text-input id="name" name="name" type="text" :value="old('name', $user->name)"

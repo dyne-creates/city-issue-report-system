@@ -22,6 +22,9 @@ class UpdateIssueRequest extends FormRequest
      */
     public function rules(): array
     {
+        $isCitizen = auth()->user()->role === 'citizen';
+        // adjust based on the actual role or user
+
         return [
             'user_id' => ['sometimes', 'integer', 'exists:users,id'],
             'barangay_id' => ['sometimes', 'integer', 'exists:barangays,id'],
@@ -29,11 +32,13 @@ class UpdateIssueRequest extends FormRequest
             'title' => ['sometimes', 'string', 'max:200'],
             'description' => ['sometimes', 'string'],
             'specific_location' => ['nullable', 'string', 'max:255'],
-            'status' => ['required', 'in:reported,verified,in_progress,completed'],
             'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'photo_path' => ['nullable', 'string', 'max:255'],
             'resolved_at' => ['nullable', 'date'],
+        ] + ($isCitizen ? [] : [
+            // ONLY staff/admin can update these
+            'status' => ['required', 'in:reported,verified,in_progress,completed'],
             'remarks' => ['nullable', 'string'],
-        ];
+        ]);
     }
 }

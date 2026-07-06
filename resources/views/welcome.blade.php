@@ -12,8 +12,7 @@
 
     <!-- Bootstrap 5 -->
     <link href="{{ asset('bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
-        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
     <style>
         :root {
@@ -28,19 +27,13 @@
             --shadow: 0 25px 60px rgba(15, 23, 42, .25);
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
-
         body {
             font-family: "Instrument Sans", sans-serif;
             background: #f8fafc;
             color: #1f2937;
         }
 
-        /* ======================================================
-   HERO
-====================================================== */
+        /* HERO */
 
         .hero {
             position: relative;
@@ -62,96 +55,64 @@
             content: "";
             position: absolute;
             inset: 0;
-            background:
-                linear-gradient(110deg,
+            background:linear-gradient(110deg,
                     rgba(15, 23, 42, .90) 0%,
                     rgba(67, 56, 202, .65) 45%,
                     rgba(124, 58, 237, .35) 100%);
         }
 
-        /* ======================================================
-   NAVBAR
-====================================================== */
+        /* NAVBAR */
 
         .glass-navbar {
-
             background: rgba(255, 255, 255, .12);
-
-            backdrop-filter: blur(14px);
-
-            -webkit-backdrop-filter: blur(14px);
-
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, .18);
-
-            border-radius: 999px;
-
+            border-radius: 99px;
             box-shadow: 0 10px 35px rgba(0, 0, 0, .15);
         }
 
         .navbar-brand {
-
             color: #fff !important;
-
             font-size: 1.35rem;
-
             font-weight: 700;
         }
 
         .nav-link {
-
             color: rgba(255, 255, 255, .92) !important;
-
             font-weight: 500;
         }
 
         .nav-link:hover {
-
             color: #fff !important;
         }
 
-        /* ======================================================
-   HERO TEXT
-====================================================== */
+        /* HERO TEXT */
 
         .hero-title {
-
             font-size: clamp(3rem, 6vw, 5rem);
-
             line-height: 1.05;
-
             font-weight: 800;
-
             color: #fff;
-
             margin-bottom: 1.5rem;
         }
 
         .text-accent {
-
             color: var(--accent);
         }
 
         .hero-text {
-
             color: var(--text-light);
-
             font-size: 1.08rem;
-
             line-height: 1.8;
-
             max-width: 560px;
         }
 
-        /* ======================================================
-   BUTTONS
-====================================================== */
+        /* BUTTONS */
 
         .btn-primary {
-
             border: none;
-
             background: linear-gradient(135deg, #7c3aed, #5b21b6);
-
             box-shadow: 0 10px 25px rgba(109, 40, 217, .25);
         }
 
@@ -165,176 +126,111 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, .15);
         }
 
-        /* ======================================================
-   PHONE MOCKUP
-====================================================== */
+        /* PHONE PLACEHOLDER */
 
         .phone-frame {
-
             width: 320px;
-
             height: 640px;
-
             background: #101827;
-
             border-radius: 42px;
-
             padding: 12px;
-
             position: relative;
-
             margin: auto;
-
-            box-shadow:
-                0 35px 80px rgba(0, 0, 0, .35),
-                inset 0 0 0 2px rgba(255, 255, 255, .06);
+            box-shadow: 0 35px 80px rgba(0, 0, 0, .35), inset 0 0 0 2px rgba(255, 255, 255, .06);
         }
 
         .phone-frame::before {
-
             content: "";
-
             position: absolute;
-
             top: 10px;
-
             left: 50%;
-
             transform: translateX(-50%);
-
             width: 110px;
-
             height: 24px;
-
             background: #000;
-
             border-radius: 20px;
-
             z-index: 100;
         }
 
         .phone-screen {
-
             width: 100%;
-
             height: 100%;
-
             overflow: hidden;
-
             border-radius: 32px;
-
             background: #fff;
-
             display: flex;
-
             flex-direction: column;
         }
 
-        /* ======================================================
-   APP UI
-====================================================== */
+        /* APP UI */
 
         .app-header {
-
             display: flex;
-
             justify-content: space-between;
-
             align-items: center;
-
             padding: 18px 20px;
-
             border-bottom: 1px solid #edf2f7;
         }
 
         .app-header h6 {
-
             font-weight: 700;
-
             margin-bottom: 2px;
         }
 
         .report-image {
-
             height: 210px;
-
             overflow: hidden;
         }
 
         .report-image img {
-
             width: 100%;
-
             height: 100%;
-
             object-fit: cover;
         }
 
         .app-content {
-
             padding: 20px;
-
             flex: 1;
         }
 
         .info-chip {
-
             display: flex;
-
             align-items: center;
-
             gap: .6rem;
-
             background: #f4f4f5;
-
             border-radius: 14px;
-
             padding: 12px 14px;
-
             margin-bottom: 12px;
-
             font-size: .9rem;
-
             color: #475569;
         }
-
         .info-chip i {
-
             color: var(--primary);
         }
 
         .app-content .btn {
-
             margin-top: 1rem;
         }
 
-        /* ======================================================
-   RESPONSIVE
-====================================================== */
+        /* RESPONSIVE */
 
         @media (max-width:991.98px) {
 
             .hero {
-
                 min-height: auto;
-
                 text-align: center;
-
                 padding: 2rem 0 3rem;
             }
 
             .hero-text {
-
                 margin: auto;
             }
 
             .hero .d-flex {
-
                 justify-content: center;
             }
 
             .phone-frame {
-
                 margin-top: 2.5rem;
             }
         }
@@ -342,34 +238,27 @@
         @media (max-width:767.98px) {
 
             .hero-title {
-
                 font-size: 2.6rem;
             }
 
             .btn-lg {
-
                 width: 100%;
             }
 
             .stat-card {
-
                 text-align: center;
             }
 
             .phone-frame {
-
                 width: 290px;
-
                 height: 590px;
             }
 
             .navbar-collapse {
-
                 margin-top: 1rem;
             }
 
             .navbar-nav {
-
                 gap: .75rem;
             }
         }
@@ -378,17 +267,17 @@
 
 <body>
 
-    <!-- ================= HERO ================= -->
+    <!--  HERO  -->
     <section class="hero py-4 py-lg-5">
 
         <div class="hero-bg"></div>
 
         <div class="container">
 
-            <!-- ================= NAVBAR ================= -->
+            <!--  NAVBAR  -->
 
             @if (Route::has('login'))
-                <nav class="navbar navbar-expand-lg glass-navbar mb-5 px-3 py-3">
+                <nav class="navbar navbar-expand-lg glass-navbar mb-5 px-5 py-3">
 
                     <a class="navbar-brand d-flex align-items-center fw-bold text-white" href="{{ url('/') }}">
                         <img src="{{ asset('logo.png') }}" alt="Logo" width="42" class="me-2">
@@ -426,7 +315,7 @@
 
                                     <li class="nav-item">
                                         <a href="{{ route('register') }}" class="btn btn-primary rounded-pill px-4">
-                                            Report an Issue
+                                            Register
                                         </a>
                                     </li>
 
@@ -451,9 +340,7 @@
 
                     <h1 class="hero-title text-white">
 
-                        Empowering Baguio,
-                        <span class="text-accent">one report</span>
-                        at a time.
+                        Empowering Baguio, <span class="text-accent">one report</span> at a time.
 
                     </h1>
 
@@ -476,11 +363,11 @@
 
                         @else
 
-                            <a href="{{ route('register') }}" class="btn btn-light btn-lg rounded-pill px-3">
+                            <a href="{{ route('register') }}" class="btn btn-light btn-md rounded-pill px-3">
                                 Create Account
                             </a>
 
-                            <a href="{{ route('login') }}" class="btn btn-outline-light btn-lg rounded-pill px-3">
+                            <a href="{{ route('login') }}" class="btn btn-outline-light btn-md rounded-pill px-3">
                                 Track Reports
                             </a>
 

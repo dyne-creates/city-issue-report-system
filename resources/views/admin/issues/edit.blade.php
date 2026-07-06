@@ -11,7 +11,6 @@
                 <div
                     class="relative lg:col-span-2 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-2xl border border-violet-100 dark:border-gray-700">
 
-                    {{-- purple top accent --}}
                     <div class="h-1 w-full bg-gradient-to-r from-violet-600 to-purple-600"></div>
 
                     <div class="p-6 text-gray-900 dark:text-gray-100">
@@ -57,8 +56,12 @@
                         @endif
 
                         <form action="{{ route('admin.issues.update', $issue->id) }}" method="POST" class="space-y-6">
+
                             @csrf
                             @method('PUT')
+
+                            <input type="hidden" name="page" value="{{ request('page') }}">
+                            <input type="hidden" name="search" value="{{ request('search') }}">
 
                             <div>
                                 <x-input-label for="status" :value="__('New Status')" />
@@ -93,28 +96,39 @@
                         </form>
                     </div>
                 </div>
-
+                {{-- Status History --}}
                 <div
                     class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-2xl border border-violet-100 dark:border-gray-700">
                     <div class="p-6 text-gray-900 dark:text-gray-100">
+
                         <h3 class="text-lg font-medium mb-4">Status History</h3>
+
                         <div class="space-y-4">
+
                             @forelse ($statusLogs as $log)
                                 <div class="border-l-4 border-violet-500 pl-4">
+
                                     <p class="text-sm font-semibold">
-                                        {{ \Illuminate\Support\Str::headline($log->old_status ?? 'initial') }} to
+                                        {{ \Illuminate\Support\Str::headline($log->old_status ?? 'initial') }}
+                                        to
                                         {{ \Illuminate\Support\Str::headline($log->new_status) }}
                                     </p>
+
                                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ $log->changed_by_name }} - {{ $log->created_at }}
+                                        {{ $log->changed_by_display }} • {{ \Carbon\Carbon::parse($log->created_at)->format('F d, Y h:i A') }}
                                     </p>
+
                                     @if ($log->remarks)
-                                        <p class="mt-1 text-sm text-gray-700 dark:text-gray-300">{{ $log->remarks }}</p>
+                                        <p class="mt-1 text-sm text-gray-700 dark:text-gray-300">
+                                            {{ $log->remarks }}
+                                        </p>
                                     @endif
+
                                 </div>
                             @empty
                                 <p class="text-sm text-gray-500">No status history yet.</p>
                             @endforelse
+
                         </div>
                     </div>
                 </div>

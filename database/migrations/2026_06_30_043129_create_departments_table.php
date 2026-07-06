@@ -9,8 +9,8 @@ return new class extends Migration
     /**
      * Run the migrations.
      *
-     * departments — city departments responsible for handling issue categories.
-     * Examples: "Public Works", "Sanitation", "Electrical / Street Lighting".
+     * departments - goverment departments responsible for handling issue categories.
+     *             - like BENECO/ BCPO
      * No foreign keys — root table.
      */
     public function up(): void

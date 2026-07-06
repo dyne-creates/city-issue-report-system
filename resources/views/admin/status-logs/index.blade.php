@@ -91,9 +91,9 @@
                                         </td>
                                         <td class="py-4 px-6">
                                             {{ \Illuminate\Support\Str::headline($statusLog->new_status) }}</td>
-                                        <td class="py-4 px-6">{{ $statusLog->changed_by_name }}</td>
+                                        <td class="py-4 px-6">{{ $statusLog->changed_by_display }}</td>
                                         <td class="py-4 px-6">{{ $statusLog->remarks ?? 'N/A' }}</td>
-                                        <td class="py-4 px-6">{{ $statusLog->created_at }}</td>
+                                        <td class="py-4 px-6">{{ \Carbon\Carbon::parse($statusLog->created_at)->format('F d, Y h:i A') }}</td>
                                     </tr>
                                 @empty
                                     <tr>

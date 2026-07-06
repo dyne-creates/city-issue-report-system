@@ -46,11 +46,18 @@ class UserController extends Controller
         if ($request->filled('role')) {
             $query->where('users.role', $request->role);
         }
+        // search by department
+        if ($request->filled('department_id')) {
+            $query->where('users.department_id', $request->department_id);
+        }
+
+        $departments = Department::all()->sortBy('name');
 
         $resultCount = (clone $query)->count();
+
         $users = $query->orderBy('users.role')->orderBy('users.name')->paginate(10)->withQueryString();
 
-        return view('admin.users.index', compact('users', 'resultCount'));
+        return view('admin.users.index', compact('users', 'resultCount', 'departments'));
     }
 
     /**
@@ -129,26 +136,45 @@ class UserController extends Controller
 
         DB::table('users')->where('id', $id)->update($values);
 
-        return redirect()->route('admin.users.index')
+        return redirect()->route('admin.users.index', $request->only('page', 'search'))
             ->with('success', 'User updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy(User $user, Request $request)
     {
         if ($user->id === auth()->id()) {
             return redirect()
-                ->route('admin.users.index')
-                ->with('error', 'You cannot delete your own account.');
+                ->route('admin.users.index', [
+                    'page' => $request->page,
+                ])->with('error', 'You cannot delete your own account.');
         }
 
         $user->delete();
 
+        $page = max((int) $request->page, 1);
+
+        $query = User::query();
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $total = $query->count();
+
+        $lastPage = max((int) ceil($total / 10), 1);
+
+        if ($page > $lastPage) {
+            $page = $lastPage;
+        }
+
         return redirect()
-            ->route('admin.users.index')
-            ->with('success', 'User deleted successfully.');
+            ->route('admin.barangays.index', [
+                'page' => $page,
+                'search' => $request->search,
+            ])->with('success', 'User deleted successfully.');
     }
 
     /**

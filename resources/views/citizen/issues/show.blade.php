@@ -54,13 +54,17 @@
 
                             <div>
                                 <dt class="font-semibold text-gray-500 dark:text-gray-400">Submitted</dt>
-                                <dd class="text-gray-900 dark:text-gray-100">{{ $issue->created_at }}</dd>
+                                <dd class="text-gray-900 dark:text-gray-100">
+                                    {{ \Carbon\Carbon::parse($issue->created_at)->format('F d, Y h:i A') }}
+                                </dd>
                             </div>
 
                             @if ($issue->resolved_at)
                                 <div>
-                                    <dt class="font-semibold text-gray-500 dark:text-gray-400">Resolved</dt>
-                                    <dd class="text-gray-900 dark:text-gray-100">{{ $issue->resolved_at }}</dd>
+                                    <dt class="font-semibold text-gray-500 dark:text-gray-400">Resolved At</dt>
+                                    <dd class="text-gray-900 dark:text-gray-100">
+                                        {{ \Carbon\Carbon::parse($issue->resolved_at)->format('F d, Y h:i A') }}
+                                    </dd>
                                 </div>
                             @endif
 
@@ -118,7 +122,7 @@
                                     </p>
 
                                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ $log->changed_by_name }} - {{ $log->created_at }}
+                                        {{ $log->changed_by_display }} • {{ $log->formatted_date }}
                                     </p>
 
                                     @if ($log->remarks)

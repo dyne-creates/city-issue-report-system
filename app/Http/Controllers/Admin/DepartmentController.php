@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 use App\Models\Department;
+
 class DepartmentController extends Controller
 {
     /**
@@ -21,12 +22,13 @@ class DepartmentController extends Controller
 
         if ($request->filled('search')) {
             $query->where(function ($query) use ($request) {
-                $query->where('name', 'like', '%'.$request->search.'%')
-                    ->orWhere('description', 'like', '%'.$request->search.'%');
+                $query->where('name', 'like', '%' . $request->search . '%')
+                    ->orWhere('description', 'like', '%' . $request->search . '%');
             });
         }
 
         $resultCount = (clone $query)->count();
+
         $departments = $query->orderBy('name')->paginate(10)->withQueryString();
 
         return view('admin.departments.index', compact('departments', 'resultCount'));
@@ -54,9 +56,7 @@ class DepartmentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show()
-    {
-    }
+    public function show() {}
 
     /**
      * Show the form for editing the specified resource.
@@ -74,19 +74,37 @@ class DepartmentController extends Controller
 
         $department->update($request->validated());
 
-        return redirect()->route('admin.departments.index')
+        return redirect()->route('admin.departments.index', $request->only('page', 'search'))
             ->with('success', 'Department updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Department $department)
+    public function destroy(Department $department, Request $request)
     {
         try {
             $department->delete();
-            return redirect()->route('admin.departments.index')
-                ->with('success', 'Department deleted successfully.');
+            $page = max((int) $request->page, 1);
+
+            $query = Department::query();
+
+            if ($request->filled('search')) {
+                $query->where('name', 'like', '%' . $request->search . '%');
+            }
+
+            $total = $query->count();
+
+            $lastPage = max((int) ceil($total / 10), 1);
+
+            if ($page > $lastPage) {
+                $page = $lastPage;
+            }
+
+            return redirect()->route('admin.departments.index', [
+                'page' => $page,
+                'search' => $request->search,
+            ])->with('success', 'Department deleted successfully.');
         } catch (QueryException) {
             return redirect()->route('admin.departments.index')
                 ->with('error', 'Department cannot be deleted because it is still being used.');

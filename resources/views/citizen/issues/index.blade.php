@@ -153,14 +153,115 @@
                                         </td>
 
                                         <td class="py-4 px-6">
-                                            {{ $issue->created_at }}
+                                            {{ \Carbon\Carbon::parse($issue->created_at)->format('F d, Y h:i A') }}
                                         </td>
 
                                         <td class="py-4 px-6 text-center">
-                                            <a href="{{ route('citizen.issues.show', $issue->id) }}"
-                                               class="text-sm font-medium text-violet-600 dark:text-violet-400 hover:underline">
-                                                View
-                                            </a>
+
+                                            <div class="flex flex-col items-center gap-2">
+
+                                                {{-- Action Links --}}
+                                                <div class="flex items-center justify-center gap-4">
+
+                                                    {{-- View --}}
+                                                    <a href="{{ route('citizen.issues.show', $issue->id) }}"
+                                                        class="text-sm font-medium text-violet-600 hover:text-violet-700 hover:underline">
+                                                        View
+                                                    </a>
+
+                                                    {{-- Edit --}}
+                                                    @if ($issue->status === 'reported')
+
+                                                        <a href="{{ route('citizen.issues.edit', ['issue' => $issue->id,
+                                                            'page' => request('page'),
+                                                        ]) }}"
+                                                            class="text-sm font-medium text-amber-600 hover:text-amber-700 hover:underline">
+                                                            Edit
+                                                        </a>
+
+                                                    @else
+
+                                                        <span class="text-sm font-medium text-gray-400 cursor-not-allowed">
+                                                            Edit
+                                                        </span>
+
+                                                    @endif
+
+                                                    {{-- Delete --}}
+                                                    <form action="{{ route('citizen.issues.destroy', $issue->id) }}" method="POST" x-data="{ open: false }" class="inline">
+
+                                                        @csrf
+                                                        @method('DELETE')
+
+                                                        @if ($issue->status === 'reported')
+
+                                                            <input type="hidden" name="page" value="{{ request('page') }}">
+
+                                                            <button type="button" @click="open = true" class="text-sm font-medium text-red-600 hover:text-red-700 hover:underline">
+                                                                Delete
+                                                            </button>
+
+                                                            {{-- Delete Confirmation --}}
+                                                            <div x-show="open" x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-black/40" style="display: none;">
+
+                                                                <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+
+                                                                    <h2 class="text-lg font-semibold text-slate-800">
+                                                                        Delete Issue
+                                                                    </h2>
+
+                                                                    <p class="mt-2 text-sm text-slate-600">
+                                                                        Are you sure you want to delete "<strong>{{ $issue->title }}</strong>"?
+                                                                        This action cannot be undone.
+                                                                    </p>
+
+                                                                    <div class="mt-6 flex justify-end gap-3">
+
+                                                                        <button type="button" @click="open = false" class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+                                                                            Cancel
+                                                                        </button>
+
+                                                                        <button
+                                                                            type="submit"
+                                                                            class="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">
+                                                                            Delete
+                                                                        </button>
+
+                                                                    </div>
+
+                                                                </div>
+
+                                                            </div>
+
+                                                        @else
+
+                                                            <span class="text-sm font-medium text-gray-400 cursor-not-allowed">
+                                                                Delete
+                                                            </span>
+
+                                                        @endif
+
+                                                    </form>
+
+                                                </div>
+
+                                                {{-- Status Message --}}
+                                                @if ($issue->status === 'completed')
+
+                                                    <p class="text-xs text-gray-500 italic max-w-[190px] leading-5">
+                                                        This report can no longer be edited or deleted because it has been completed.
+                                                    </p>
+
+                                                @elseif ($issue->status !== 'reported')
+
+                                                    <p class="text-xs text-gray-500 italic max-w-[190px] leading-5">
+                                                        This report can no longer be edited or deleted because processing has already begun.
+                                                    </p>
+
+                                                @endif
+
+                                            </div>
+
                                         </td>
 
                                     </tr>

@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+use App\Models\Barangay;
+use App\Models\Issue;
+
 class IssueController extends Controller
 {
     /**
@@ -16,6 +19,7 @@ class IssueController extends Controller
      */
     public function index(Request $request)
     {
+        // retrieves the filters that were previously stored 
         $filters = session('citizen_issue_filters', []);
 
         $query = DB::table('issues')
@@ -33,7 +37,7 @@ class IssueController extends Controller
                 'departments.name AS department_name'
             )
             ->where('issues.user_id', Auth::id());
-
+        // check if the search value exists
         if (! empty($filters['search'])) {
             $query->where(function ($query) use ($filters) {
                 $query->where('issues.title', 'like', '%' . $filters['search'] . '%')
@@ -70,7 +74,7 @@ class IssueController extends Controller
             'date_from' => ['nullable', 'date'],
             'date_to' => ['nullable', 'date', 'after_or_equal:date_from'],
         ]);
-
+        // removes empty values
         session(['citizen_issue_filters' => array_filter($filters, fn($value) => filled($value))]);
 
         return redirect()->route('citizen.issues.index');
@@ -88,9 +92,7 @@ class IssueController extends Controller
      */
     public function create()
     {
-        $barangays = DB::table('barangays')
-            ->orderBy('name')
-            ->get();
+        $barangays = Barangay::all()->sortBy('name');
 
         $categories = DB::table('categories')
             ->join('departments', 'categories.department_id', '=', 'departments.id')
@@ -111,14 +113,13 @@ class IssueController extends Controller
      */
     public function store(StoreIssueRequest $request)
     {
-        
         $validated = $request->validated();
         $photoPath = null;
 
         if ($request->hasFile('photo')) {
             $photoPath = $request->file('photo')->store('images', 'public');
         }
-        
+
         DB::transaction(function () use ($validated, $photoPath) {
             // Citizens create reports; workflow status always starts as reported.
             $issueId = DB::table('issues')->insertGetId([
@@ -155,7 +156,7 @@ class IssueController extends Controller
      */
     public function show(string $id)
     {
-        
+
         $issue = DB::table('issues')
             ->join('barangays', 'issues.barangay_id', '=', 'barangays.id')
             ->join('categories', 'issues.category_id', '=', 'categories.id')
@@ -174,7 +175,24 @@ class IssueController extends Controller
 
         $statusLogs = DB::table('status_logs')
             ->join('users', 'status_logs.changed_by', '=', 'users.id')
-            ->select('status_logs.*', 'users.name AS changed_by_name')
+            ->leftJoin('departments', 'users.department_id', '=', 'departments.id')
+            ->select(
+                'status_logs.*',
+                'users.name AS user_name',
+                'users.role',
+                'departments.name AS department_name',
+
+                DB::raw("
+            CASE
+                WHEN users.role = 'admin' THEN CONCAT(users.name, ' (Admin)')
+                WHEN users.role = 'staff' THEN CONCAT(users.name, ' (', departments.name, ')')
+                WHEN users.role = 'citizen' THEN CONCAT(users.name, ' (Reporter)')
+                ELSE users.name
+            END AS changed_by_display
+        "),
+
+                DB::raw("DATE_FORMAT(status_logs.created_at, '%M %d, %Y %h:%i %p') AS formatted_date")
+            )
             ->where('status_logs.issue_id', $id)
             ->orderBy('status_logs.created_at')
             ->get();
@@ -185,26 +203,83 @@ class IssueController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Issue $issue)
     {
-        return redirect()->route('citizen.issues.show', $id);
+        abort_unless($issue->user_id === Auth::id(), 403); // can only edit his own, not the records of the other citizens/ users
+
+        if ($issue->status !== 'reported') {
+            return redirect()
+                ->route('citizen.issues.show', $issue)
+                ->with('error', 'You can only edit a report while it is still in the Reported status.');
+        }
+
+        $barangays = Barangay::orderBy('name')->get();
+
+        $categories = DB::table('categories')
+            ->join('departments', 'categories.department_id', '=', 'departments.id')
+            ->select(
+                'categories.id',
+                'categories.name',
+                'departments.name AS department_name'
+            )
+            ->orderBy('departments.name')
+            ->orderBy('categories.name')
+            ->get();
+
+        return view('citizen.issues.edit', compact('issue', 'barangays', 'categories'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateIssueRequest $request, string $id)
+    public function update(UpdateIssueRequest $request, Issue $issue)
     {
-        return redirect()->route('citizen.issues.show', $id)
-            ->with('error', 'Submitted reports cannot be edited from the citizen page.');
+        abort_unless($issue->user_id === Auth::id(), 403);
+
+        if ($issue->status !== 'reported') {
+            return redirect()
+                ->route('citizen.issues.show', $issue)
+                ->with('error', 'This report can no longer be edited.');
+        }
+
+        $validated = $request->validated();
+
+        $data = [
+            'barangay_id' => $validated['barangay_id'],
+            'category_id' => $validated['category_id'],
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'specific_location' => $validated['specific_location'] ?? null,
+        ];
+
+        if ($request->hasFile('photo')) {
+            $data['photo_path'] = $request->file('photo')->store('images', 'public');
+        }
+
+        $issue->update($data);
+
+        return redirect()
+            ->route('citizen.issues.index', $issue)
+            ->with('success', 'Issue report updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Issue $issue)
     {
-        return redirect()->route('citizen.issues.index')
-            ->with('error', 'Submitted reports cannot be deleted from the citizen page.');
+        abort_unless($issue->user_id === Auth::id(), 403);
+
+        if ($issue->status !== 'reported') {
+            return redirect()
+                ->route('citizen.issues.index')
+                ->with('error', 'This report can no longer be deleted.');
+        }
+
+        $issue->delete();
+
+        return redirect()
+            ->route('citizen.issues.index')
+            ->with('success', 'Issue report deleted successfully.');
     }
 }

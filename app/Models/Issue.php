@@ -12,13 +12,9 @@ class Issue extends Model
     use HasFactory;
 
     /*
-    |--------------------------------------------------------------------------
-    | Status constants
-    |--------------------------------------------------------------------------
-    | Mirrors the `status` enum on the issues table (and the enums on
-    | status_logs). Application-layer flow:
-    |   reported -> verified -> in_progress -> completed
-    | (admin may move an issue backward if needed)
+        Status constants
+        Mirrors the `status` enum on the issues table (and the enums on status_logs). 
+        Application-layer flow: reported -> verified -> in_progress -> completed (admin may move an issue backward if needed)
     */
     public const STATUS_REPORTED    = 'reported';
     public const STATUS_VERIFIED    = 'verified';
@@ -52,9 +48,7 @@ class Issue extends Model
     ];
 
     /*
-    |--------------------------------------------------------------------------
     | Relationships
-    |--------------------------------------------------------------------------
     */
 
     /**
@@ -90,12 +84,6 @@ class Issue extends Model
     {
         return $this->hasMany(Status_Log::class)->orderBy('created_at');
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Convenience accessors
-    |--------------------------------------------------------------------------
-    */
 
     /**
      * Whether this issue has reached the completed state.

@@ -30,11 +30,11 @@ class IssueController extends Controller
 
         if ($request->filled('search')) {
             $query->where(function ($query) use ($request) {
-                $query->where('issues.title', 'like', '%'.$request->search.'%')
-                    ->orWhere('issues.description', 'like', '%'.$request->search.'%')
-                    ->orWhere('users.name', 'like', '%'.$request->search.'%')
-                    ->orWhere('barangays.name', 'like', '%'.$request->search.'%')
-                    ->orWhere('categories.name', 'like', '%'.$request->search.'%');
+                $query->where('issues.title', 'like', '%' . $request->search . '%')
+                    ->orWhere('issues.description', 'like', '%' . $request->search . '%')
+                    ->orWhere('users.name', 'like', '%' . $request->search . '%')
+                    ->orWhere('barangays.name', 'like', '%' . $request->search . '%')
+                    ->orWhere('categories.name', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -91,9 +91,25 @@ class IssueController extends Controller
 
         abort_if(! $issue, 404);
 
+        // for history purpose
         $statusLogs = DB::table('status_logs')
             ->join('users', 'status_logs.changed_by', '=', 'users.id')
-            ->select('status_logs.*', 'users.name AS changed_by_name')
+            ->leftJoin('departments', 'users.department_id', '=', 'departments.id')
+            ->select(
+                'status_logs.*',
+                'users.name AS user_name',
+                'users.role',
+                'departments.name AS department_name',
+
+                DB::raw("
+                    CASE
+                        WHEN users.role = 'admin' THEN CONCAT(users.name, ' (Admin)')
+                        WHEN users.role = 'staff' THEN CONCAT(users.name, ' (', departments.name, ')')
+                        WHEN users.role = 'citizen' THEN CONCAT(users.name, ' (Reporter)')
+                        ELSE users.name
+                    END AS changed_by_display
+                "),
+            )
             ->where('status_logs.issue_id', $id)
             ->orderBy('status_logs.created_at')
             ->get();

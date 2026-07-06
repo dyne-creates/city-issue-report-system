@@ -14,6 +14,8 @@ use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
+use App\Models\Barangay;
+
 class RegisteredUserController extends Controller
 {
     /**
@@ -21,7 +23,10 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.register');
+        return view(
+            'auth.register',
+            ['barangays' => Barangay::orderBy('name')->get()]
+        );
     }
 
     /**
@@ -33,8 +38,27 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'email' => [
+                'required',
+                'string',
+                'lowercase',
+                'email',
+                'max:255',
+                'unique:' . User::class,
+            ],
+            'contact_number' => [
+                'required',
+                'digits: 11',
+            ],
+            'barangay_id' => [
+                'required',
+                'exists:barangays,id',
+            ],
+            'password' => [
+                'required',
+                'confirmed',
+                Rules\Password::defaults(),
+            ],
         ]);
 
         $userId = DB::table('users')->insertGetId([

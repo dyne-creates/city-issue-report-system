@@ -24,9 +24,7 @@ class Status_Log extends Model
     ];
 
     /*
-    |--------------------------------------------------------------------------
     | Relationships
-    |--------------------------------------------------------------------------
     */
 
     /**
@@ -39,8 +37,7 @@ class Status_Log extends Model
 
     /**
      * The staff/admin user who made this status change.
-     * Foreign key is status_logs.changed_by, not the default user_id,
-     * so it must be specified explicitly.
+     * Foreign key is status_logs.changed_by, not the default user_id, so it must be specified explicitly.
      */
     public function changedBy(): BelongsTo
     {

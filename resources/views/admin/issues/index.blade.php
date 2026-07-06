@@ -94,69 +94,113 @@
                                         <td class="py-4 px-6">{{ $issue->category_name }}</td>
                                         <td class="py-4 px-6">{{ $issue->department_name }}</td>
                                         <td class="py-4 px-6">{{ \Illuminate\Support\Str::headline($issue->status) }}</td>
-                                        <td class="py-4 px-6">{{ $issue->created_at }}</td>
+                                        <td class="py-4 px-6">{{ \Carbon\Carbon::parse($issue->created_at)->format('F d, Y h:i A') }}</td>
                                         <td class="py-4 px-6 text-center">
-                                            <div class="flex justify-center items-center gap-3">
-                                                <a href="{{ route('admin.issues.edit', $issue->id) }}"
-                                                    class="text-sm font-medium text-amber-600 dark:text-amber-400 hover:underline">
-                                                    Status
-                                                </a>
-                                                <form action="{{ route('admin.issues.destroy', $issue->id) }}" method="POST"
-                                                    x-data="{ open: false }" class="inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    @if($issue->status === 'reported')
 
-                                                        <button type="button" @click="open = true"
-                                                            class="text-sm font-medium text-red-600 hover:text-red-700 hover:underline">
-                                                            Delete
-                                                        </button>
-                                                        {{-- Alert Pop up --}}
+                                            <div class="flex flex-col items-center gap-2">
 
-                                                        <div x-show="open" x-transition
-                                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-                                                            style="display: none;">
+                                                {{-- Action Links --}}
+                                                <div class="flex items-center justify-center gap-4">
 
-                                                            <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+                                                    {{-- Edit --}}
+                                                    <a href="{{ route('admin.issues.edit', [
+                                                        'issue' => $issue->id,
+                                                        'page' => request('page'),
+                                                        'search' => request('search'),
+                                                    ]) }}"
+                                                        class="text-sm font-medium text-amber-600 hover:text-amber-700 hover:underline">
+                                                        Edit
+                                                    </a>
 
-                                                                {{-- Title --}}
-                                                                <h2 class="text-lg font-semibold text-slate-800">
-                                                                    Delete Issue {{ $issue->title }}
-                                                                </h2>
+                                                    {{-- Delete --}}
+                                                    <form action="{{ route('admin.issues.destroy', $issue->id) }}"
+                                                        method="POST"
+                                                        x-data="{ open: false }"
+                                                        class="inline">
 
-                                                                {{-- Message --}}
-                                                                <p class="mt-2 text-sm text-slate-600">
-                                                                    Are you sure you want to delete this issue?
-                                                                    This action cannot be undone.
-                                                                </p>
+                                                        @csrf
+                                                        @method('DELETE')
 
-                                                                {{-- Actions --}}
-                                                                <div class="mt-6 flex justify-end gap-3">
+                                                        @if($issue->status === 'reported')
 
-                                                                    <button type="button" @click="open = false"
-                                                                        class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
-                                                                        Cancel
-                                                                    </button>
+                                                            <input type="hidden" name="page" value="{{ request('page') }}">
+                                                            <input type="hidden" name="search" value="{{ request('search') }}">
 
-                                                                    <button type="submit"
-                                                                        class="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">
-                                                                        Delete
-                                                                    </button>
+                                                            <button
+                                                                type="button"
+                                                                @click="open = true"
+                                                                class="text-sm font-medium text-red-600 hover:text-red-700 hover:underline">
+                                                                Delete
+                                                            </button>
+
+                                                            {{-- Delete Confirmation --}}
+                                                            <div
+                                                                x-show="open"
+                                                                x-transition
+                                                                class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+                                                                style="display: none;">
+
+                                                                <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+
+                                                                    <h2 class="text-lg font-semibold text-slate-800">
+                                                                        Delete Issue {{ $issue->title }}
+                                                                    </h2>
+
+                                                                    <p class="mt-2 text-sm text-slate-600">
+                                                                        Are you sure you want to delete this issue?
+                                                                        This action cannot be undone.
+                                                                    </p>
+
+                                                                    <div class="mt-6 flex justify-end gap-3">
+
+                                                                        <button
+                                                                            type="button"
+                                                                            @click="open = false"
+                                                                            class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+                                                                            Cancel
+                                                                        </button>
+
+                                                                        <button
+                                                                            type="submit"
+                                                                            class="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">
+                                                                            Delete
+                                                                        </button>
+
+                                                                    </div>
 
                                                                 </div>
 
                                                             </div>
-                                                        </div>
 
-                                                    @else
+                                                        @else
 
-                                                        <span class="text-xs text-slate-500 italic">
-                                                            Cannot delete once work has begun.
-                                                        </span>
+                                                            <span class="text-sm font-medium text-gray-400 cursor-not-allowed">
+                                                                Delete
+                                                            </span>
 
-                                                    @endif
-                                                </form>
+                                                        @endif
+
+                                                    </form>
+
+                                                </div>
+
+                                                {{-- Status Message --}}
+                                                @if($issue->status === 'completed')
+
+                                                    <p class="text-xs text-gray-500 italic max-w-[180px] leading-5">
+                                                        Cannot delete an issue once it has been completed.
+                                                    </p>
+
+                                                @elseif($issue->status !== 'reported')
+
+                                                    <p class="text-xs text-gray-500 italic max-w-[180px] leading-5">
+                                                        Cannot delete an issue once work has begun.
+                                                    </p>
+
+                                                @endif
+
                                             </div>
+
                                         </td>
                                     </tr>
                                 @empty

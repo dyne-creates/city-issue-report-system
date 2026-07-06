@@ -86,17 +86,14 @@ class IssueController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Issue $issue)
-    {
-        return redirect()->route('admin.issues.edit');
-    }
+    public function show() {}
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
-        
+
         $issue = $this->findIssueWithDetails($id);
 
         abort_if(! $issue, 404);
@@ -144,14 +141,14 @@ class IssueController extends Controller
             }
         });
 
-        return redirect()->route('admin.issues.index')
+        return redirect()->route('admin.issues.index', $request->only('page', 'search'))
             ->with('success', 'Issue status updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Issue $issue)
+    public function destroy(Issue $issue, Request $request)
     {
         if ($issue->status !== 'reported') {
             return redirect()
@@ -162,9 +159,27 @@ class IssueController extends Controller
         try {
             $issue->delete();
 
+            $page = max((int) $request->page, 1);
+
+            $query = Issue::query();
+
+            if ($request->filled('search')) {
+                $query->where('name', 'like', '%' . $request->search . '%');
+            }
+
+            $total = $query->count();
+
+            $lastPage = max((int) ceil($total / 10), 1);
+
+            if ($page > $lastPage) {
+                $page = $lastPage;
+            }
+
             return redirect()
-                ->route('admin.issues.index')
-                ->with('success', 'Issue deleted successfully.');
+                ->route('admin.issues.index', [
+                    'page' => $page,
+                    'search' => $request->search,
+                ])->with('success', 'Issue deleted successfully.');
         } catch (QueryException) {
             return redirect()
                 ->route('admin.issues.index')
@@ -190,12 +205,27 @@ class IssueController extends Controller
             ->first();
     }
 
-    private function statusLogsForIssue(string $issueId)
+    private function statusLogsForIssue(string $id)
     {
         return DB::table('status_logs')
             ->join('users', 'status_logs.changed_by', '=', 'users.id')
-            ->select('status_logs.*', 'users.name AS changed_by_name')
-            ->where('status_logs.issue_id', $issueId)
+            ->leftJoin('departments', 'users.department_id', '=', 'departments.id')
+            ->select(
+                'status_logs.*',
+                'users.name AS user_name',
+                'users.role',
+                'departments.name AS department_name',
+
+                DB::raw("
+            CASE
+                WHEN users.role = 'admin' THEN CONCAT(users.name, ' (Admin)')
+                WHEN users.role = 'staff' THEN CONCAT(users.name, ' (', departments.name, ')')
+                WHEN users.role = 'citizen' THEN CONCAT(users.name, ' (Reporter)')
+                ELSE users.name
+            END AS changed_by_display
+        "),
+            )
+            ->where('status_logs.issue_id', $id)
             ->orderBy('status_logs.created_at')
             ->get();
     }

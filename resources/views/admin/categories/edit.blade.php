@@ -31,6 +31,9 @@
                         @csrf
                         @method('PUT') {{-- Required method spoofing for Laravel update resources --}}
 
+                        <input type="hidden" name="page" value="{{ request('page') }}">
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+
                         <!-- Category Name Field Input Group -->
                         <div>
                             <x-input-label for="name" :value="__('Category Name')" />
