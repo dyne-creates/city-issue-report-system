@@ -14,6 +14,7 @@ use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
 use App\Http\Controllers\Staff\IssueController as StaffIssueController;
 use App\Http\Controllers\Citizen\DashboardController as CitizenDashboardController;
 use App\Http\Controllers\Citizen\IssueController as CitizenIssueController;
+use App\Http\Controllers\Citizen\FeedbackController;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -62,45 +63,50 @@ Route::middleware('auth')->group(function () {
     })->name('issue.photo');
 
     // citizen routes
-Route::middleware(['auth', 'citizenMiddleware'])
-    ->prefix('citizen')
-    ->name('citizen.') // Added a dot here for clean naming (e.g., citizen.dashboard)
-    ->group(function () {
+    Route::middleware(['auth', 'citizenMiddleware'])
+        ->prefix('citizen')
+        ->name('citizen.')
+        ->group(function () {
 
-        Route::get('dashboard', [CitizenDashboardController::class, 'index'])->name('dashboard');
-        Route::post('issues/search', [CitizenIssueController::class, 'search'])->name('issues.search');
-        Route::get('issues/search/reset', [CitizenIssueController::class, 'resetSearch'])->name('issues.search.reset');
-        Route::resource('issues', CitizenIssueController::class);
-    });
+            Route::get('dashboard', [CitizenDashboardController::class, 'index'])->name('dashboard');
+            Route::post('issues/search', [CitizenIssueController::class, 'search'])->name('issues.search');
+            Route::get('issues/search/reset', [CitizenIssueController::class, 'resetSearch'])->name('issues.search.reset');
+            Route::resource('issues', CitizenIssueController::class);
 
-// staff routes
-Route::middleware(['auth', 'staffMiddleware'])
-    ->prefix('staff')
-    ->name('staff.') // Added a dot here (e.g., staff.dashboard)
-    ->group(function () {
+            Route::get('/issues/{issue}/feedback/create', [FeedbackController::class, 'create'])->name('feedbacks.create');
+            Route::post('/issues/{issue}/feedback', [FeedbackController::class, 'store'])->name('feedbacks.store');
+        });
 
-        Route::get('dashboard', [StaffDashboardController::class, 'index'])->name('dashboard'); // Removed extra /staff/
-        Route::resource('issues', StaffIssueController::class)->only(['index', 'show', 'edit', 'update']);
-    });
+    // staff routes
+    Route::middleware(['auth', 'staffMiddleware'])
+        ->prefix('staff')
+        ->name('staff.')
+        ->group(function () {
 
-// admin routes
-Route::middleware(['auth', 'adminMiddleware'])
-    ->prefix('admin')
-    ->name('admin.') // Added a dot here (e.g., admin.users.index)
-    ->group(function () {
+            Route::get('dashboard', [StaffDashboardController::class, 'index'])->name('dashboard'); // Removed extra /staff/
+            Route::resource('issues', StaffIssueController::class)->only(['index', 'show', 'edit', 'update']);
+        });
 
-        Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard'); // Removed extra /admin/
+    // admin routes
+    Route::middleware(['auth', 'adminMiddleware'])
+        ->prefix('admin')
+        ->name('admin.')
+        ->group(function () {
 
-        Route::resource('users', UserController::class);
-        Route::resource('barangays', BarangayController::class);
-        Route::resource('categories', CategoryController::class);
-        Route::resource('departments', DepartmentController::class);
-        Route::resource('status-logs', StatusLogController::class);
-        Route::resource('issues', AdminIssueController::class);
-        Route::resource('reports', ReportController::class);
-    });
+            Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard'); // Removed extra /admin/
 
+            Route::resource('users', UserController::class);
+            Route::resource('barangays', BarangayController::class);
+            Route::resource('categories', CategoryController::class);
+            Route::resource('departments', DepartmentController::class);
+            Route::resource('status-logs', StatusLogController::class);
+            Route::resource('issues', AdminIssueController::class);
+            Route::get('reports/pdf', [ReportController::class, 'exportPdf'])
+                ->name('reports.pdf');
+
+            Route::resource('reports', ReportController::class)
+                ->only(['index']);
+        });
 });
 
 require __DIR__ . '/auth.php';
-

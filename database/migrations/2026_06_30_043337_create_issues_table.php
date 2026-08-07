@@ -27,33 +27,28 @@ return new class extends Migration
 
             // The citizen who filed this issue
             $table->foreignId('user_id')
-                  ->constrained('users')
-                  ->restrictOnDelete()
-                  ->restrictOnUpdate();
+                ->constrained('users')
+                ->restrictOnDelete()
+                ->restrictOnUpdate();
 
             // Where the issue is located
             $table->foreignId('barangay_id')
-                  ->constrained('barangays')
-                  ->restrictOnDelete()
-                  ->restrictOnUpdate();
+                ->constrained('barangays')
+                ->restrictOnDelete()
+                ->restrictOnUpdate();
 
             // Classification of issue type
             $table->foreignId('category_id')
-                  ->constrained('categories')
-                  ->restrictOnDelete()
-                  ->restrictOnUpdate();
+                ->constrained('categories')
+                ->restrictOnDelete()
+                ->restrictOnUpdate();
 
-            $table->string('title', 200);               // short summary or headline
-            $table->text('description');                // full detail from citizen
+            $table->string('title', 200); // short summary or headline
+            $table->text('description'); // full detail from citizen
 
             // Specific location within the barangay (e.g. "sa gilid ng bato.")
             $table->string('specific_location', 255)->nullable();
-
-            // Status enum
-            // 'reported'    — citizen submitted the issue
-            // 'verified'    — staff confirmed the issue is real/valid
-            // 'in_progress' — staff/department is actively working on it
-            // 'completed'   — issue has been resolved
+            
             $table->enum('status', ['reported', 'verified', 'in_progress', 'completed',])->default('reported');
 
             // Relative file path stored in storage/app/public

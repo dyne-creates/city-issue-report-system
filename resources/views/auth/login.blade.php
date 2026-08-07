@@ -1,4 +1,6 @@
 <x-guest-layout>
+    @section('title', 'Login')
+
     <div class="mb-3">
         <a href="{{ url('/') }}"
            class="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">

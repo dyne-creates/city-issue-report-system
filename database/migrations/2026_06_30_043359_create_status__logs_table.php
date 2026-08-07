@@ -18,7 +18,7 @@ return new class extends Migration
      *   - Accountability (who changed what, when, with what remarks)
      *
      * Referential integrity:
-     *   issue_id   → CASCADE delete
+     *   issue_id  → CASCADE delete
      *     If an issue is deleted, its logs go with it.
      *     Logs without an issue are meaningless.
      *

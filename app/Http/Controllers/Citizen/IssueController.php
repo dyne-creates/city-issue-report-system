@@ -173,6 +173,10 @@ class IssueController extends Controller
 
         abort_if(! $issue, 404);
 
+        $feedback = DB::table('feedbacks')
+            ->where('issue_id', $id)
+            ->first();
+
         $statusLogs = DB::table('status_logs')
             ->join('users', 'status_logs.changed_by', '=', 'users.id')
             ->leftJoin('departments', 'users.department_id', '=', 'departments.id')
@@ -197,7 +201,7 @@ class IssueController extends Controller
             ->orderBy('status_logs.created_at')
             ->get();
 
-        return view('citizen.issues.show', compact('issue', 'statusLogs'));
+        return view('citizen.issues.show', compact('issue', 'statusLogs', 'feedback'));
     }
 
     /**

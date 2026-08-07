@@ -114,9 +114,22 @@ class IssueController extends Controller
             ->orderBy('status_logs.created_at')
             ->get();
 
-        $statuses = ['reported', 'verified', 'in_progress', 'completed'];
+        $allowedTransitions = [
+            'reported'    => ['verified'],
+            'verified'    => ['in_progress'],
+            'in_progress' => ['completed'],
+            'completed'   => [],
+        ];
 
-        return view('staff.issues.edit', compact('issue', 'statusLogs', 'statuses'));
+        $statuses = $allowedTransitions[$issue->status];
+
+        // Citizen-submitted feedback (if any) for this issue.
+        // Only ever displayed here — staff do not create or edit feedback.
+        $feedback = DB::table('feedbacks')
+            ->where('issue_id', $id)
+            ->first();
+
+        return view('staff.issues.edit', compact('issue', 'statusLogs', 'statuses', 'feedback'));
     }
 
     /**
@@ -125,20 +138,57 @@ class IssueController extends Controller
     public function update(UpdateIssueRequest $request, string $id)
     {
         $validated = $request->validated();
+
         $issue = $this->findAssignedIssue($id);
 
         abort_if(! $issue, 404);
 
-        DB::transaction(function () use ($id, $issue, $validated) {
-            $newStatus = $validated['status'];
+        // Completed issues can no longer be modified.
+        if ($issue->status === 'completed') {
+            return redirect()
+                ->route('staff.issues.edit', $id)
+                ->with('error', 'Completed issues can no longer be updated.');
+        }
 
-            // Staff can update workflow status only for issues assigned to their department.
+        $newStatus = $validated['status'];
+
+        // Define the required workflow.
+        $allowedTransitions = [
+            'reported'    => 'verified',
+            'verified'    => 'in_progress',
+            'in_progress' => 'completed',
+        ];
+
+        // Reject invalid status transitions.
+        if (($allowedTransitions[$issue->status] ?? null) !== $newStatus) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Invalid status transition. Please follow the workflow: Reported → Verified → In Progress → Completed.'
+                );
+        }
+
+        // Require remarks when marking an issue as completed.
+        if ($newStatus === 'completed' && empty(trim($validated['remarks'] ?? ''))) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Remarks are required when completing an issue. Please describe the action taken.'
+                );
+        }
+
+        DB::transaction(function () use ($id, $issue, $newStatus, $validated) {
+
             DB::table('issues')
                 ->where('id', $id)
                 ->update([
                     'status' => $newStatus,
                     'resolved_at' => $newStatus === 'completed'
-                        ? ($validated['resolved_at'] ?? now())
+                        ? now()
                         : null,
                     'updated_at' => now(),
                 ]);
@@ -156,7 +206,8 @@ class IssueController extends Controller
             }
         });
 
-        return redirect()->route('staff.issues.index')
+        return redirect()
+            ->route('staff.issues.index')
             ->with('success', 'Issue status updated successfully.');
     }
 

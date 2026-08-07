@@ -1,4 +1,7 @@
+
+
 <x-guest-layout>
+    @section('title', 'Register')
 
     <div class="mb-3">
         <a href="{{ url('/') }}"

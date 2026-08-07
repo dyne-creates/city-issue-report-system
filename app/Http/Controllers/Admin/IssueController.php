@@ -101,7 +101,13 @@ class IssueController extends Controller
         $statusLogs = $this->statusLogsForIssue($id);
         $statuses = ['reported', 'verified', 'in_progress', 'completed'];
 
-        return view('admin.issues.edit', compact('issue', 'statusLogs', 'statuses'));
+        // Citizen-submitted feedback (if any) for this issue.
+        // Only ever displayed here — admins do not create or edit feedback.
+        $feedback = DB::table('feedbacks')
+            ->where('issue_id', $id)
+            ->first();
+
+        return view('admin.issues.edit', compact('issue', 'statusLogs', 'statuses', 'feedback'));
     }
 
     /**

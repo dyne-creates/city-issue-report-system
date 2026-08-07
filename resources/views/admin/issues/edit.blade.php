@@ -1,4 +1,5 @@
 <x-app-layout>
+    @section('title', 'Admin')
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Issue Status') }}
@@ -133,6 +134,52 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Citizen Feedback --}}
+            @if ($issue->status === 'completed')
+                <div
+                    class="mt-6 relative bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-2xl border border-violet-100 dark:border-gray-700">
+
+                    <div class="h-1 w-full bg-gradient-to-r from-violet-600 to-purple-600"></div>
+
+                    <div class="p-6 text-gray-900 dark:text-gray-100">
+
+                        <h3 class="text-lg font-medium mb-4">Citizen Feedback</h3>
+
+                        @if ($feedback)
+                            <div class="flex items-center gap-2 mb-2">
+                                @for ($i = 1; $i <= 5; $i++)
+                                    <span
+                                        class="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold
+                                            {{ $i <= $feedback->rating
+                                                ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white'
+                                                : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500' }}">
+                                        {{ $i }}
+                                    </span>
+                                @endfor
+                                <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                                    {{ $feedback->rating }} / 5
+                                </span>
+                            </div>
+
+                            @if ($feedback->comment)
+                                <p class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                                    {{ $feedback->comment }}
+                                </p>
+                            @endif
+
+                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                Submitted {{ \Carbon\Carbon::parse($feedback->created_at)->format('F d, Y h:i A') }}
+                            </p>
+                        @else
+                            <p class="text-sm text-gray-500 dark:text-gray-400 italic">
+                                The citizen has not submitted feedback for this issue yet.
+                            </p>
+                        @endif
+
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </x-app-layout>

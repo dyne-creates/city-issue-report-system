@@ -1,4 +1,5 @@
 <x-app-layout>
+    @section('title', 'Admin')
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Categories') }}
@@ -9,8 +10,6 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div
                 class="relative bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-2xl border border-violet-100 dark:border-gray-700">
-
-                {{-- purple top accent --}}
                 <div class="h-1 w-full bg-gradient-to-r from-violet-600 to-purple-600"></div>
 
                 <div class="p-6 text-gray-900 dark:text-gray-100">

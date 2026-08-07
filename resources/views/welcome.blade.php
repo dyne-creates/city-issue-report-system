@@ -29,7 +29,6 @@
 
         body {
             font-family: "Instrument Sans", sans-serif;
-            background: #f8fafc;
             color: #1f2937;
         }
 
@@ -64,27 +63,28 @@
         /* NAVBAR */
 
         .glass-navbar {
-            background: rgba(255, 255, 255, .12);
+             /* background: rgba(255, 255, 255, .12);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); */
+            background-color: #f8fafc;
             border: 1px solid rgba(255, 255, 255, .18);
             border-radius: 99px;
             box-shadow: 0 10px 35px rgba(0, 0, 0, .15);
         }
 
         .navbar-brand {
-            color: #fff !important;
+            color: #000000eb !important;
             font-size: 1.35rem;
             font-weight: 700;
         }
 
         .nav-link {
-            color: rgba(255, 255, 255, .92) !important;
+            color: rgba(3, 3, 3, 0.92) !important;
             font-weight: 500;
         }
 
         .nav-link:hover {
-            color: #fff !important;
+            color: #00000091 !important;
         }
 
         /* HERO TEXT */
@@ -145,10 +145,10 @@
             top: 10px;
             left: 50%;
             transform: translateX(-50%);
-            width: 110px;
+            width: 100px;
             height: 24px;
             background: #000;
-            border-radius: 20px;
+            border-radius: 100px;
             z-index: 100;
         }
 
@@ -280,7 +280,7 @@
                 <nav class="navbar navbar-expand-lg glass-navbar mb-5 px-5 py-3">
 
                     <a class="navbar-brand d-flex align-items-center fw-bold text-white" href="{{ url('/') }}">
-                        <img src="{{ asset('logo.png') }}" alt="Logo" width="42" class="me-2">
+                        <img src="{{ asset('logo.png') }}" alt="Logo" width="45" class="me-2">
                         KailianFix
                     </a>
 
