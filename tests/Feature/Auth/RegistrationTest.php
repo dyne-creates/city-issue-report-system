@@ -1,9 +1,12 @@
 <?php
 
 test('registration screen can be rendered', function () {
+    \App\Models\Barangay::create(['name' => 'Test Barangay']);
+
     $response = $this->get('/register');
 
     $response->assertStatus(200);
+    $response->assertSee('Test Barangay');
 });
 
 test('new users can register', function () {
@@ -15,5 +18,5 @@ test('new users can register', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $response->assertRedirect(route('citizen.dashboard', absolute: false));
 });

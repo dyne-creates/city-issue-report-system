@@ -27,20 +27,11 @@ class ProfileUpdateRequest extends FormRequest
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
             'contact_number' => [
-<<<<<<< HEAD
                 'nullable',
                 'digits: 11',
             ],
             'barangay_id' => [
                 'nullable',
-=======
-                'required',
-                'string',
-                'max:11',
-            ],
-            'barangay_id' => [
-                'required',
->>>>>>> d97a5ac3780dcf270d7a5b2cc879f28b8a482c15
                 'exists:barangays,id',
             ],
         ];
