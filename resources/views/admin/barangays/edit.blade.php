@@ -1,4 +1,5 @@
 <x-app-layout>
+    @section('title', 'Admin')
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Barangays') }}
@@ -26,11 +27,14 @@
                     </div>
 
                     <!-- Modification Form -->
-                    <form action="{{ route('admin.barangays.update', $barangay->id) }}" method="POST"
-                        class="space-y-6 max-w-xl">
+                    <form action="{{ route('admin.barangays.update', $barangay->id) }}" method="POST" class="space-y-6 max-w-xl">
+
                         @csrf
                         @method('PUT') {{-- Required method spoofing for Laravel update resources --}}
-
+                        
+                        <input type="hidden" name="page" value="{{ request('page') }}">
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                        
                         <!-- Barangay Name Field Input Group -->
                         <div>
                             <x-input-label for="name" :value="__('Barangay Name')" />

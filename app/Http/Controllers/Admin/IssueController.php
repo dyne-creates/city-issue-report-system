@@ -9,6 +9,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 use App\Models\Issue;
 
@@ -86,17 +87,14 @@ class IssueController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Issue $issue)
-    {
-        return redirect()->route('admin.issues.edit');
-    }
+    public function show() {}
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
-        
+
         $issue = $this->findIssueWithDetails($id);
 
         abort_if(! $issue, 404);
@@ -104,7 +102,13 @@ class IssueController extends Controller
         $statusLogs = $this->statusLogsForIssue($id);
         $statuses = ['reported', 'verified', 'in_progress', 'completed'];
 
-        return view('admin.issues.edit', compact('issue', 'statusLogs', 'statuses'));
+        // Citizen-submitted feedback (if any) for this issue.
+        // Only ever displayed here — admins do not create or edit feedback.
+        $feedback = DB::table('feedbacks')
+            ->where('issue_id', $id)
+            ->first();
+
+        return view('admin.issues.edit', compact('issue', 'statusLogs', 'statuses', 'feedback'));
     }
 
     /**
@@ -144,14 +148,14 @@ class IssueController extends Controller
             }
         });
 
-        return redirect()->route('admin.issues.index')
+        return redirect()->route('admin.issues.index', $request->only('page', 'search'))
             ->with('success', 'Issue status updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Issue $issue)
+    public function destroy(Issue $issue, Request $request)
     {
         if ($issue->status !== 'reported') {
             return redirect()
@@ -160,15 +164,47 @@ class IssueController extends Controller
         }
 
         try {
+            $photoPath = $issue->photo_path;
+
             $issue->delete();
 
+            if ($photoPath && Storage::disk('public')->exists($photoPath)) {
+                Storage::disk('public')->delete($photoPath);
+            }
+
+            $page = max((int) $request->page, 1);
+
+            $query = Issue::query();
+
+            if ($request->filled('search')) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('title', 'like', '%' . $request->search . '%')
+                        ->orWhere('description', 'like', '%' . $request->search . '%');
+                });
+            }
+
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+
+            $total = $query->count();
+
+            $lastPage = max((int) ceil($total / 10), 1);
+
+            if ($page > $lastPage) {
+                $page = $lastPage;
+            }
+
             return redirect()
-                ->route('admin.issues.index')
-                ->with('success', 'Issue deleted successfully.');
+                ->route('admin.issues.index', array_filter([
+                    'page' => $page,
+                    'search' => $request->search,
+                    'status' => $request->status,
+                ]))->with('success', 'Issue deleted successfully.');
         } catch (QueryException) {
             return redirect()
                 ->route('admin.issues.index')
-                ->with('error', 'Issue cannot be deleted at this time.');
+                ->with('error', 'Issue cannot be deleted because it has related records.');
         }
     }
 
@@ -190,12 +226,27 @@ class IssueController extends Controller
             ->first();
     }
 
-    private function statusLogsForIssue(string $issueId)
+    private function statusLogsForIssue(string $id)
     {
         return DB::table('status_logs')
             ->join('users', 'status_logs.changed_by', '=', 'users.id')
-            ->select('status_logs.*', 'users.name AS changed_by_name')
-            ->where('status_logs.issue_id', $issueId)
+            ->leftJoin('departments', 'users.department_id', '=', 'departments.id')
+            ->select(
+                'status_logs.*',
+                'users.name AS user_name',
+                'users.role',
+                'departments.name AS department_name',
+
+                DB::raw("
+            CASE
+                WHEN users.role = 'admin' THEN CONCAT(users.name, ' (Admin)')
+                WHEN users.role = 'staff' THEN CONCAT(users.name, ' (', departments.name, ')')
+                WHEN users.role = 'citizen' THEN CONCAT(users.name, ' (Reporter)')
+                ELSE users.name
+            END AS changed_by_display
+        "),
+            )
+            ->where('status_logs.issue_id', $id)
             ->orderBy('status_logs.created_at')
             ->get();
     }

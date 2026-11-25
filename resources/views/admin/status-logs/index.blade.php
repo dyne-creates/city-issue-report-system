@@ -1,4 +1,5 @@
 <x-app-layout>
+    @section('title', 'Admin')
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Status Logs') }}
@@ -78,26 +79,35 @@
                                     <th class="py-3 px-6">Changed By</th>
                                     <th class="py-3 px-6">Remarks</th>
                                     <th class="py-3 px-6">Date</th>
+                                    <th class="py-3 px-6 text-right">Action</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                 @forelse ($statusLogs as $statusLog)
                                     <tr class="bg-white dark:bg-gray-800 hover:bg-violet-50/40 dark:hover:bg-gray-700/50">
                                         <td class="py-4 px-6 font-medium text-gray-900 dark:text-white">
-                                            #{{ $statusLog->issue_id }} - {{ $statusLog->issue_title }}
+                                            <a href="{{ route('admin.status-logs.show', $statusLog->id) }}" class="text-violet-600 dark:text-violet-400 hover:underline">
+                                                #{{ $statusLog->issue_id }} - {{ $statusLog->issue_title }}
+                                            </a>
                                         </td>
                                         <td class="py-4 px-6">
                                             {{ $statusLog->old_status ? \Illuminate\Support\Str::headline($statusLog->old_status) : 'Initial' }}
                                         </td>
                                         <td class="py-4 px-6">
                                             {{ \Illuminate\Support\Str::headline($statusLog->new_status) }}</td>
-                                        <td class="py-4 px-6">{{ $statusLog->changed_by_name }}</td>
+                                        <td class="py-4 px-6">{{ $statusLog->changed_by_display }}</td>
                                         <td class="py-4 px-6">{{ $statusLog->remarks ?? 'N/A' }}</td>
-                                        <td class="py-4 px-6">{{ $statusLog->created_at }}</td>
+                                        <td class="py-4 px-6">{{ \Carbon\Carbon::parse($statusLog->created_at)->format('F d, Y h:i A') }}</td>
+                                        <td class="py-4 px-6 text-right">
+                                            <a href="{{ route('admin.status-logs.show', $statusLog->id) }}"
+                                                class="inline-flex items-center text-xs font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-800 dark:hover:text-violet-300">
+                                                View &rarr;
+                                            </a>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="py-8 px-6 text-center text-gray-400 italic">No status logs
+                                        <td colspan="7" class="py-8 px-6 text-center text-gray-400 italic">No status logs
                                             found.</td>
                                     </tr>
                                 @endforelse

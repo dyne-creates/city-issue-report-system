@@ -28,7 +28,7 @@ class ProfileUpdateRequest extends FormRequest
             ],
             'contact_number' => [
                 'nullable',
-                'digits: 11',
+                'digits:11',
             ],
             'barangay_id' => [
                 'nullable',

@@ -1,4 +1,5 @@
 <x-app-layout>
+    @section('title', 'Admin')
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Users') }}
@@ -20,11 +21,15 @@
                             current password.</p>
                     </div>
 
-                    <form action="{{ route('admin.users.update', $user->id) }}" method="POST"
-                        class="space-y-6 max-w-2xl">
+                    <form action="{{ route('admin.users.update', $user->id) }}" method="POST" class="space-y-6 max-w-2xl"
+                        x-data="{ role: '{{ old('role', $user->role) }}' }">
+                        
                         @csrf
                         @method('PUT')
 
+                        <input type="hidden" name="page" value="{{ request('page') }}">
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                        
                         <div>
                             <x-input-label for="name" :value="__('Name')" />
                             <x-text-input id="name" name="name" type="text" :value="old('name', $user->name)"
@@ -43,7 +48,7 @@
 
                         <div>
                             <x-input-label for="role" :value="__('Role')" />
-                            <select id="role" name="role"
+                            <select id="role" name="role" x-model="role"
                                 class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-violet-500 dark:focus:border-violet-600 focus:ring-violet-500 dark:focus:ring-violet-600"
                                 required>
                                 @foreach (['citizen' => 'Citizen', 'staff' => 'Staff', 'admin' => 'Admin'] as $value => $label)
@@ -54,11 +59,11 @@
                             <x-input-error class="mt-2" :messages="$errors->get('role')" />
                         </div>
 
-                        <div>
-                            <x-input-label for="barangay_id" :value="__('Barangay')" />
+                        <div x-show="role === 'citizen'" x-cloak>
+                            <x-input-label for="barangay_id" :value="__('Barangay (Required for Citizens)')" />
                             <select id="barangay_id" name="barangay_id"
                                 class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-violet-500 dark:focus:border-violet-600 focus:ring-violet-500 dark:focus:ring-violet-600">
-                                <option value="">None</option>
+                                <option value="">Select Barangay</option>
                                 @foreach ($barangays as $barangay)
                                     <option value="{{ $barangay->id }}" {{ old('barangay_id', $user->barangay_id) == $barangay->id ? 'selected' : '' }}>{{ $barangay->name }}
                                     </option>
@@ -67,11 +72,11 @@
                             <x-input-error class="mt-2" :messages="$errors->get('barangay_id')" />
                         </div>
 
-                        <div>
-                            <x-input-label for="department_id" :value="__('Department')" />
+                        <div x-show="role === 'staff'" x-cloak>
+                            <x-input-label for="department_id" :value="__('Department (Required for Staff)')" />
                             <select id="department_id" name="department_id"
                                 class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-violet-500 dark:focus:border-violet-600 focus:ring-violet-500 dark:focus:ring-violet-600">
-                                <option value="">None</option>
+                                <option value="">Select Department</option>
                                 @foreach ($departments as $department)
                                     <option value="{{ $department->id }}" {{ old('department_id', $user->department_id) == $department->id ? 'selected' : '' }}>{{ $department->name }}
                                     </option>

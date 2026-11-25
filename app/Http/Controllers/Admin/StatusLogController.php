@@ -8,6 +8,8 @@ use App\Http\Requests\UpdateStatus_LogRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use App\Models\Department;
+
 class StatusLogController extends Controller
 {
     /**
@@ -18,6 +20,7 @@ class StatusLogController extends Controller
         $query = DB::table('status_logs')
             ->join('issues', 'status_logs.issue_id', '=', 'issues.id')
             ->join('users', 'status_logs.changed_by', '=', 'users.id')
+            ->leftJoin('departments', 'users.department_id', '=', 'departments.id')
             ->select(
                 'status_logs.id',
                 'status_logs.issue_id',
@@ -26,14 +29,24 @@ class StatusLogController extends Controller
                 'status_logs.remarks',
                 'status_logs.created_at',
                 'issues.title AS issue_title',
-                'users.name AS changed_by_name'
+                'users.name AS user_name',
+                'users.role',
+
+                DB::raw("
+            CASE
+                WHEN users.role = 'admin' THEN CONCAT(users.name, ' (Admin)')
+                WHEN users.role = 'staff' THEN CONCAT(users.name, ' (', departments.name, ')')
+                WHEN users.role = 'citizen' THEN CONCAT(users.name, ' (Reporter)')
+                ELSE users.name
+            END AS changed_by_display
+        ")
             );
 
         if ($request->filled('search')) {
             $query->where(function ($query) use ($request) {
-                $query->where('issues.title', 'like', '%'.$request->search.'%')
-                    ->orWhere('users.name', 'like', '%'.$request->search.'%')
-                    ->orWhere('status_logs.remarks', 'like', '%'.$request->search.'%');
+                $query->where('issues.title', 'like', '%' . $request->search . '%')
+                    ->orWhere('users.name', 'like', '%' . $request->search . '%')
+                    ->orWhere('status_logs.remarks', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -48,11 +61,11 @@ class StatusLogController extends Controller
         if ($request->filled('date_to')) {
             $query->whereDate('status_logs.created_at', '<=', $request->date_to);
         }
-
+        $department = Department::all();
         $resultCount = (clone $query)->count();
         $statusLogs = $query->orderByDesc('status_logs.created_at')->paginate(10)->withQueryString();
 
-        return view('admin.status-logs.index', compact('statusLogs', 'resultCount'));
+        return view('admin.status-logs.index', compact('statusLogs', 'resultCount', 'department'));
     }
 
     /**

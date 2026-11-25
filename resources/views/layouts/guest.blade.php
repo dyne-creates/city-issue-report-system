@@ -9,7 +9,7 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'KailianFix') }}</title>
+    <title>KailianFix • @yield('title')</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
 
@@ -30,15 +30,16 @@
 </script>
 
 <body
-    class="min-h-screen bg-gradient-to-br from-indigo-900 via-indigo-700 to-blue-500 flex items-center justify-center px-6">
+    class="min-h-screen bg-gradient-to-br from-indigo-900 via-indigo-700 to-blue-500 flex items-center justify-center p-6">
 
     <div class="w-full max-w-md">
 
         <div class="text-center mb-8">
 
-            <a href="/">
+            <a href="/"
+                class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-white shadow-lg mx-auto">
 
-                <img src="{{ asset('logo.png') }}" class="mx-auto h-16 w-16">
+                <img src="{{ asset('logo.png') }}" class="h-12 w-12 object-contain">
 
             </a>
 
@@ -52,7 +53,7 @@
 
         </div>
 
-        <div class="rounded-3xl bg-white/90 backdrop-blur-xl shadow-2xl p-8">
+        <div class="rounded-3xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl shadow-2xl p-8">
 
             {{ $slot }}
 

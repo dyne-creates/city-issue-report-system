@@ -51,13 +51,17 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        Auth::logout();
+        try {
+            $user->delete();
 
-        $user->delete();
+            Auth::logout();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
 
-        return Redirect::to('/');
+            return Redirect::to('/');
+        } catch (\Illuminate\Database\QueryException) {
+            return Redirect::route('profile.edit')->with('error', 'Your account cannot be deleted because you have submitted issue reports or civic records.');
+        }
     }
 }

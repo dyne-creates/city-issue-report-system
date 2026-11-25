@@ -21,9 +21,7 @@ class Department extends Model
     ];
 
     /*
-    |--------------------------------------------------------------------------
     | Relationships
-    |--------------------------------------------------------------------------
     */
 
     /**
@@ -34,5 +32,13 @@ class Department extends Model
     public function categories(): HasMany
     {
         return $this->hasMany(Category::class);
+    }
+
+    /**
+     * Staff members assigned to this department.
+     */
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class);
     }
 }

@@ -31,7 +31,7 @@ class DashboardController extends Controller
                 'categories.name AS category_name'
             )
             ->orderByDesc('issues.created_at')
-            ->limit(5)
+            ->limit(5) // restricts the result set to a maximum of 5 records
             ->get();
 
         return view('staff.dashboard', compact('counts', 'recentIssues'));

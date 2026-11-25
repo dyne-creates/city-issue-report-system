@@ -11,6 +11,12 @@ class Status_Log extends Model
     use HasFactory;
 
     /**
+     * Explicit table name because Class name has an underscore,
+     * which defaults to status__logs instead of status_logs.
+     */
+    protected $table = 'status_logs';
+
+    /**
      * Mass assignable attributes.
      *
      * @var array<int, string>
@@ -24,9 +30,7 @@ class Status_Log extends Model
     ];
 
     /*
-    |--------------------------------------------------------------------------
     | Relationships
-    |--------------------------------------------------------------------------
     */
 
     /**
@@ -39,8 +43,7 @@ class Status_Log extends Model
 
     /**
      * The staff/admin user who made this status change.
-     * Foreign key is status_logs.changed_by, not the default user_id,
-     * so it must be specified explicitly.
+     * Foreign key is status_logs.changed_by, not the default user_id, so it must be specified explicitly.
      */
     public function changedBy(): BelongsTo
     {

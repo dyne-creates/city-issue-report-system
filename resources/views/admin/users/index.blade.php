@@ -1,4 +1,5 @@
 <x-app-layout>
+    @section('title', 'Admin')
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Users') }}
@@ -10,7 +11,6 @@
             <div
                 class="relative bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-2xl border border-violet-100 dark:border-gray-700">
 
-                {{-- purple top accent --}}
                 <div class="h-1 w-full bg-gradient-to-r from-violet-600 to-purple-600"></div>
 
                 <div class="p-6 text-gray-900 dark:text-gray-100">
@@ -30,14 +30,33 @@
                         </a>
                     </div>
 
-                    <form method="GET" action="{{ route('admin.users.index') }}" class="mb-6 grid gap-4 md:grid-cols-4">
-                        <div>
+                    <form method="GET" action="{{ route('admin.users.index') }}"
+                        class="mb-6 flex flex-wrap items-end gap-4">
+
+                        <!-- Search -->
+                        <div class="w-full sm:flex-1 min-w-[220px]">
                             <x-input-label for="search" :value="__('Name, Email, or Contact')" />
                             <x-text-input id="search" name="search" type="text" :value="request('search')"
-                                class="mt-1 block w-full focus:border-violet-500 dark:focus:border-violet-600 focus:ring-violet-500 dark:focus:ring-violet-600"
-                                placeholder="Search user" />
+                                placeholder="Search user"
+                                class="mt-1 block w-full focus:border-violet-500 dark:focus:border-violet-600 focus:ring-violet-500 dark:focus:ring-violet-600" />
                         </div>
-                        <div>
+
+                        <!-- Department -->
+                        <div class="w-full sm:w-56">
+                            <x-input-label for="department_id" :value="__('Department')" />
+                            <select id="department_id" name="department_id"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-violet-500 dark:focus:border-violet-600 focus:ring-violet-500 dark:focus:ring-violet-600">
+                                <option value="">All Departments</option>
+                                @foreach ($departments as $department)
+                                    <option value="{{ $department->id }}" {{ request('department_id') == $department->id ? 'selected' : '' }}>
+                                        {{ $department->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Role -->
+                        <div class="w-full sm:w-44">
                             <x-input-label for="role" :value="__('Role')" />
                             <select id="role" name="role"
                                 class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-violet-500 dark:focus:border-violet-600 focus:ring-violet-500 dark:focus:ring-violet-600">
@@ -49,12 +68,20 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="flex items-end gap-2 md:col-span-2">
+
+                        <!-- Buttons -->
+                        <div class="flex gap-2 w-full sm:w-auto">
                             <button type="submit"
-                                class="px-4 py-2 bg-violet-600 text-white rounded-md text-xs uppercase hover:bg-violet-700 transition">Search</button>
+                                class="flex-1 sm:flex-none px-4 py-2 bg-violet-600 text-white rounded-md text-xs uppercase hover:bg-violet-700 transition">
+                                Search
+                            </button>
+
                             <a href="{{ route('admin.users.index') }}"
-                                class="px-4 py-2 border border-gray-300 dark:border-gray-500 rounded-md text-xs uppercase text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">Reset</a>
+                                class="flex-1 sm:flex-none px-4 py-2 border border-gray-300 dark:border-gray-500 rounded-md text-xs uppercase text-center text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                Reset
+                            </a>
                         </div>
+
                     </form>
 
                     <p class="mb-3 text-sm text-gray-600 dark:text-gray-400">
@@ -78,75 +105,71 @@
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                 @forelse ($users as $user)
-                                    <tr class="bg-white dark:bg-gray-800 hover:bg-violet-50/40 dark:hover:bg-gray-700/50">
-                                        <td class="py-4 px-6 font-medium text-gray-900 dark:text-white">{{ $user->name }}
-                                        </td>
-                                        <td class="py-4 px-6">{{ $user->email }}</td>
-                                        <td class="py-4 px-6 capitalize">{{ $user->role }}</td>
-                                        <td class="py-4 px-6">{{ $user->barangay_name ?? 'N/A' }}</td>
-                                        <td class="py-4 px-6">{{ $user->department_name ?? 'N/A' }}</td>
-                                        <td class="py-4 px-6">{{ $user->contact_number ?? 'N/A' }}</td>
-                                        <td class="py-4 px-6 text-center">
-                                            <div class="flex justify-center items-center gap-3">
-                                                <a href="{{ route('admin.users.edit', $user->id) }}"
-                                                    class="text-sm font-medium text-amber-600 dark:text-amber-400 hover:underline">
-                                                    Edit
-                                                </a>
-                                                {{-- Delete User --}}
-                                                <form action="{{ route('admin.users.destroy', $user->id) }}"
-                                                    x-data="{ open: false }" method="POST" class="inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    @if ($user->id !== auth()->id())
-                                                        <button type="button" @click="open = true"
-                                                            class="text-sm font-medium text-red-600 hover:text-red-700 hover:underline">
-                                                            Delete
-                                                        </button>
-                                                        {{-- Alert Pop up --}}
-
-                                                        <div x-show="open" x-transition
-                                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-                                                            style="display: none;">
-
-                                                            <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-
-                                                                {{-- Title --}}
-                                                                <h2 class="text-lg font-semibold text-slate-800">
-                                                                    Delete User {{ $user->name }}
-                                                                </h2>
-
-                                                                {{-- Message --}}
-                                                                <p class="mt-2 text-sm text-slate-600">
-                                                                    Are you sure you want to delete this user?
-                                                                    This action cannot be undone.
-                                                                </p>
-
-                                                                {{-- Actions --}}
-                                                                <div class="mt-6 flex justify-end gap-3">
-
-                                                                    <button type="button" @click="open = false"
-                                                                        class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
-                                                                        Cancel
-                                                                    </button>
-
-                                                                    <button type="submit"
-                                                                        class="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">
-                                                                        Delete
-                                                                    </button>
-
-                                                                </div>
-
-                                                            </div>
-                                                        </div>
-                                                    @else
-                                                        <span class="text-sm text-slate-400 italic">
-                                                            Current Account
-                                                        </span>
-                                                    @endif
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                                                <tr class="bg-white dark:bg-gray-800 hover:bg-violet-50/40 dark:hover:bg-gray-700/50">
+                                                                    <td class="py-4 px-6 font-medium text-gray-900 dark:text-white">{{ $user->name }}
+                                                                    </td>
+                                                                    <td class="py-4 px-6">{{ $user->email }}</td>
+                                                                    <td class="py-4 px-6 capitalize">{{ $user->role }}</td>
+                                                                    <td class="py-4 px-6">{{ $user->barangay_name ?? 'N/A' }}</td>
+                                                                    <td class="py-4 px-6">{{ $user->department_name ?? 'N/A' }}</td>
+                                                                    <td class="py-4 px-6">{{ $user->contact_number ?? 'N/A' }}</td>
+                                                                    <td class="py-4 px-6 text-center">
+                                                                        <div class="flex justify-center items-center gap-3">
+                                                                            <a href="{{ route('admin.users.edit', [
+                                        'user' => $user->id,
+                                        'page' => request('page'),
+                                        'search' => request('search'),
+                                    ]) }}"
+                                                                                class="text-sm font-medium text-amber-600 dark:text-amber-400 hover:underline">
+                                                                                Edit
+                                                                            </a>
+                                                                            {{-- Delete User --}}
+                                                                            <form action="{{ route('admin.users.destroy', $user->id) }}"
+                                                                                x-data="{ open: false }" method="POST" class="inline">
+                                                                                @csrf
+                                                                                @method('DELETE')
+                                                                                @if ($user->id !== auth()->id())
+                                                                                    <input type="hidden" name="page" value="{{ request('page') }}">
+                                                                                    <button type="button" @click="open = true"
+                                                                                        class="text-sm font-medium text-red-600 hover:text-red-700 hover:underline">
+                                                                                        Delete
+                                                                                    </button>
+                                                                                    {{-- Alert Pop up --}}
+                                                                                    <div x-show="open" x-transition
+                                                                                        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+                                                                                        style="display: none;">
+                                                                                        <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+                                                                                            {{-- Title --}}
+                                                                                            <h2 class="text-lg font-semibold text-slate-800">
+                                                                                                Delete User {{ $user->name }}
+                                                                                            </h2>
+                                                                                            {{-- Message --}}
+                                                                                            <p class="mt-2 text-sm text-slate-600">
+                                                                                                Are you sure you want to delete this user?
+                                                                                                This action cannot be undone.
+                                                                                            </p>
+                                                                                            {{-- Actions --}}
+                                                                                            <div class="mt-6 flex justify-end gap-3">
+                                                                                                <button type="button" @click="open = false"
+                                                                                                    class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+                                                                                                    Cancel
+                                                                                                </button>
+                                                                                                <button type="submit"
+                                                                                                    class="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">
+                                                                                                    Delete
+                                                                                                </button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                @else
+                                                                                    <span class="text-sm text-slate-400 italic">
+                                                                                        Current Account
+                                                                                    </span>
+                                                                                @endif
+                                                                            </form>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
                                 @empty
                                     <tr>
                                         <td colspan="7" class="py-8 px-6 text-center text-gray-400 italic">No users found.

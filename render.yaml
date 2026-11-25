@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: kailianfix
+    runtime: docker
+    region: singapore
+    plan: free
+    healthCheckPath: /login
+    envVars:
+      - key: APP_NAME
+        value: KailianFix
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: error
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: FILESYSTEM_DISK
+        value: public

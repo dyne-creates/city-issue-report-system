@@ -9,8 +9,8 @@ return new class extends Migration
     /**
      * Run the migrations.
      *
-     * categories — types of city issues, grouped under a department.
-     * Examples: "Pothole" under Public Works, "Broken Streetlight" under Electrical.
+     * categories - types of city issues, grouped under a department.
+     * Examples: "Maingay na kapitbahay" under BCPO, "Napundi nga sila" under BENECO.
      *
      * Referential integrity:
      *   department_id → RESTRICT on delete/update
@@ -32,8 +32,8 @@ return new class extends Migration
             
             $table->timestamps();
 
-            // A category name should be unique within a department
-            // (e.g. two departments can't share "Pothole" as a category name)
+            // It allows different departments to use the same category name (e.g., Department A can have "umiiyak ng pusa" and Department B can also have "umiiyak na pusa"). 
+            // It also prevents a single department from having duplicate category names, so bawal ang dalawang "umiiyak na pusa" sa iisang department.
             $table->unique(['department_id', 'name']);
         });
     }

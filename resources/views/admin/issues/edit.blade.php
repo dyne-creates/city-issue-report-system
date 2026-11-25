@@ -1,4 +1,5 @@
 <x-app-layout>
+    @section('title', 'Admin')
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Issue Status') }}
@@ -11,7 +12,6 @@
                 <div
                     class="relative lg:col-span-2 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-2xl border border-violet-100 dark:border-gray-700">
 
-                    {{-- purple top accent --}}
                     <div class="h-1 w-full bg-gradient-to-r from-violet-600 to-purple-600"></div>
 
                     <div class="p-6 text-gray-900 dark:text-gray-100">
@@ -51,14 +51,18 @@
                         @if ($issue->photo_path)
                             <h4 class="font-semibold text-gray-700 dark:text-gray-200">Photo Evidence</h4>
                             <div class="mb-6">
-                                <img src="{{ asset('storage/' . $issue->photo_path) }}" alt="Issue Photo"
+                                <img src="{{ route('issue.photo', $issue->id) }}" alt="Issue Photo"
                                     class="max-h-96 rounded-md border border-gray-200 dark:border-gray-700">
                             </div>
                         @endif
 
                         <form action="{{ route('admin.issues.update', $issue->id) }}" method="POST" class="space-y-6">
+
                             @csrf
                             @method('PUT')
+
+                            <input type="hidden" name="page" value="{{ request('page') }}">
+                            <input type="hidden" name="search" value="{{ request('search') }}">
 
                             <div>
                                 <x-input-label for="status" :value="__('New Status')" />
@@ -93,32 +97,89 @@
                         </form>
                     </div>
                 </div>
-
+                {{-- Status History --}}
                 <div
                     class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-2xl border border-violet-100 dark:border-gray-700">
                     <div class="p-6 text-gray-900 dark:text-gray-100">
+
                         <h3 class="text-lg font-medium mb-4">Status History</h3>
+
                         <div class="space-y-4">
+
                             @forelse ($statusLogs as $log)
                                 <div class="border-l-4 border-violet-500 pl-4">
+
                                     <p class="text-sm font-semibold">
-                                        {{ \Illuminate\Support\Str::headline($log->old_status ?? 'initial') }} to
+                                        {{ \Illuminate\Support\Str::headline($log->old_status ?? 'initial') }}
+                                        to
                                         {{ \Illuminate\Support\Str::headline($log->new_status) }}
                                     </p>
+
                                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ $log->changed_by_name }} - {{ $log->created_at }}
+                                        {{ $log->changed_by_display }} • {{ \Carbon\Carbon::parse($log->created_at)->format('F d, Y h:i A') }}
                                     </p>
+
                                     @if ($log->remarks)
-                                        <p class="mt-1 text-sm text-gray-700 dark:text-gray-300">{{ $log->remarks }}</p>
+                                        <p class="mt-1 text-sm text-gray-700 dark:text-gray-300">
+                                            {{ $log->remarks }}
+                                        </p>
                                     @endif
+
                                 </div>
                             @empty
                                 <p class="text-sm text-gray-500">No status history yet.</p>
                             @endforelse
+
                         </div>
                     </div>
                 </div>
             </div>
+
+            {{-- Citizen Feedback --}}
+            @if ($issue->status === 'completed')
+                <div
+                    class="mt-6 relative bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-2xl border border-violet-100 dark:border-gray-700">
+
+                    <div class="h-1 w-full bg-gradient-to-r from-violet-600 to-purple-600"></div>
+
+                    <div class="p-6 text-gray-900 dark:text-gray-100">
+
+                        <h3 class="text-lg font-medium mb-4">Citizen Feedback</h3>
+
+                        @if ($feedback)
+                            <div class="flex items-center gap-2 mb-2">
+                                @for ($i = 1; $i <= 5; $i++)
+                                    <span
+                                        class="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold
+                                            {{ $i <= $feedback->rating
+                                                ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white'
+                                                : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500' }}">
+                                        {{ $i }}
+                                    </span>
+                                @endfor
+                                <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                                    {{ $feedback->rating }} / 5
+                                </span>
+                            </div>
+
+                            @if ($feedback->comment)
+                                <p class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                                    {{ $feedback->comment }}
+                                </p>
+                            @endif
+
+                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                Submitted {{ \Carbon\Carbon::parse($feedback->created_at)->format('F d, Y h:i A') }}
+                            </p>
+                        @else
+                            <p class="text-sm text-gray-500 dark:text-gray-400 italic">
+                                The citizen has not submitted feedback for this issue yet.
+                            </p>
+                        @endif
+
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </x-app-layout>

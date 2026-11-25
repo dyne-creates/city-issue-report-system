@@ -46,11 +46,18 @@ class UserController extends Controller
         if ($request->filled('role')) {
             $query->where('users.role', $request->role);
         }
+        // search by department
+        if ($request->filled('department_id')) {
+            $query->where('users.department_id', $request->department_id);
+        }
+
+        $departments = Department::all()->sortBy('name');
 
         $resultCount = (clone $query)->count();
+
         $users = $query->orderBy('users.role')->orderBy('users.name')->paginate(10)->withQueryString();
 
-        return view('admin.users.index', compact('users', 'resultCount'));
+        return view('admin.users.index', compact('users', 'resultCount', 'departments'));
     }
 
     /**
@@ -129,26 +136,60 @@ class UserController extends Controller
 
         DB::table('users')->where('id', $id)->update($values);
 
-        return redirect()->route('admin.users.index')
+        return redirect()->route('admin.users.index', $request->only('page', 'search'))
             ->with('success', 'User updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy(User $user, Request $request)
     {
         if ($user->id === auth()->id()) {
             return redirect()
-                ->route('admin.users.index')
+                ->route('admin.users.index', $request->only('page', 'search', 'role', 'department_id'))
                 ->with('error', 'You cannot delete your own account.');
         }
 
-        $user->delete();
+        try {
+            $user->delete();
 
-        return redirect()
-            ->route('admin.users.index')
-            ->with('success', 'User deleted successfully.');
+            $page = max((int) $request->page, 1);
+
+            $query = User::query();
+
+            if ($request->filled('search')) {
+                $query->where('name', 'like', '%' . $request->search . '%');
+            }
+
+            if ($request->filled('role')) {
+                $query->where('role', $request->role);
+            }
+
+            if ($request->filled('department_id')) {
+                $query->where('department_id', $request->department_id);
+            }
+
+            $total = $query->count();
+
+            $lastPage = max((int) ceil($total / 10), 1);
+
+            if ($page > $lastPage) {
+                $page = $lastPage;
+            }
+
+            return redirect()
+                ->route('admin.users.index', array_filter([
+                    'page' => $page,
+                    'search' => $request->search,
+                    'role' => $request->role,
+                    'department_id' => $request->department_id,
+                ]))->with('success', 'User deleted successfully.');
+        } catch (QueryException) {
+            return redirect()
+                ->route('admin.users.index', $request->only('page', 'search', 'role', 'department_id'))
+                ->with('error', 'User cannot be deleted because they have associated reports, status logs, or records.');
+        }
     }
 
     /**

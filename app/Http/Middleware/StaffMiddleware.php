@@ -16,9 +16,14 @@ class StaffMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::user()->role == 'staff') {
+        if (! Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        if (Auth::user()->role === 'staff') {
             return $next($request);
         }
-        return redirect()->back();
+
+        return redirect()->route('dashboard')->with('error', 'You are not authorized to access that section.');
     }
 }

@@ -36,8 +36,27 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'email' => [
+                'required',
+                'string',
+                'lowercase',
+                'email',
+                'max:255',
+                'unique:' . User::class,
+            ],
+            'contact_number' => [
+                'required',
+                'digits:11',
+            ],
+            'barangay_id' => [
+                'required',
+                'exists:barangays,id',
+            ],
+            'password' => [
+                'required',
+                'confirmed',
+                Rules\Password::defaults(),
+            ],
         ]);
 
         $userId = DB::table('users')->insertGetId([
@@ -45,7 +64,10 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'contact_number' => $request->contact_number,
             'barangay_id' => $request->barangay_id,
+            'role' => User::ROLE_CITIZEN,
             'password' => Hash::make($request->password),
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         Auth::loginUsingId($userId);

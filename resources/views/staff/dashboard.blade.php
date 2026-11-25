@@ -1,4 +1,5 @@
 <x-app-layout>
+    @section('title', 'Staff')
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Staff Dashboard') }}
@@ -7,6 +8,18 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+
+            @if (session('success'))
+                <div class="rounded-xl bg-emerald-50 dark:bg-emerald-950/40 p-4 border border-emerald-200 dark:border-emerald-800 text-sm text-emerald-800 dark:text-emerald-300 shadow-sm">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="rounded-xl bg-red-50 dark:bg-red-950/40 p-4 border border-red-200 dark:border-red-800 text-sm text-red-800 dark:text-red-300 shadow-sm">
+                    {{ session('error') }}
+                </div>
+            @endif
 
             {{-- Stats --}}
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

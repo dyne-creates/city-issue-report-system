@@ -1,4 +1,5 @@
 <x-app-layout>
+    @section('title', 'Admin')
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Departments') }}
@@ -82,17 +83,27 @@
                                         </td>
                                         <td class="py-4 px-6 text-center">
                                             <div class="flex justify-center items-center gap-3">
+
                                                 <!-- Edit Button -->
-                                                <a href="{{ route('admin.departments.edit', $department->id) }}"
-                                                    class="text-sm font-medium text-amber-600 dark:text-amber-400 hover:underline">
+                                                <a href="{{ route('admin.departments.edit', [
+                                                    'department' => $department->id,
+                                                    'page' => request('page'),
+                                                    'search' => request('search'),
+                                                ]) }}"
+                                                class="text-sm font-medium text-amber-600 dark:text-amber-400 hover:underline">
                                                     Edit
                                                 </a>
 
                                                 <!-- Delete Button Form -->
                                                 <form action="{{ route('admin.departments.destroy', $department->id) }}"
                                                     x-data="{ open: false }" method="POST" class="inline">
+
                                                     @csrf
                                                     @method('DELETE')
+
+                                                    <input type="hidden" name="page" value="{{ request('page') }}">
+                                                    <input type="hidden" name="search" value="{{ request('search') }}">
+                                                    
                                                     <button type="button" @click="open = true"
                                                         class="text-sm font-medium text-red-600 hover:text-red-700 hover:underline">
                                                         Delete

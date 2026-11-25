@@ -36,7 +36,7 @@ $width = match ($width) {
         x-transition:leave="transition ease-in duration-150"
         x-transition:leave-start="opacity-100 scale-100"
         x-transition:leave-end="opacity-0 scale-95"
-        class="absolute z-50 mt-3 {{ $width }} rounded-2xl {{ $alignmentClasses }}"
+        class="absolute bottom-full mb-2 right-0 z-50 shadow-lg origin-bottom-right z-50 mt-3 {{ $width }} rounded-2xl {{ $alignmentClasses }}"
         style="display:none;"
     >
 

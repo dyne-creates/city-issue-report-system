@@ -1,4 +1,5 @@
 <x-app-layout>
+    @section('title', 'Admin')
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Barangays') }}
@@ -80,26 +81,32 @@
                                         <td class="py-4 px-6 text-center">
                                             <div class="flex justify-center items-center gap-3">
                                                 <!-- Edit Button -->
-                                                <a href="{{ route('admin.barangays.edit', $barangay->id) }}"
-                                                    class="text-sm font-medium text-amber-600 dark:text-amber-400 hover:underline">
+                                                <a href="{{ route('admin.barangays.edit', [
+                                                        'barangay' => $barangay->id,
+                                                        'page' => request('page'),
+                                                        'search' => request('search'),
+                                                    ]) }}" class="text-sm font-medium text-amber-600 dark:text-amber-400 hover:underline">
                                                     Edit
                                                 </a>
 
                                                 <!-- Delete Button Form -->
                                                 <form action="{{ route('admin.barangays.destroy', $barangay->id) }}"
                                                     method="POST" x-data="{ open: false }" class="inline">
+
                                                     @csrf
                                                     @method('DELETE')
 
+                                                    <input type="hidden" name="page" value="{{ request('page') }}">
+                                                    <input type="hidden" name="search" value="{{ request('search') }}">
                                                     <button type="button" @click="open = true"
                                                         class="text-sm font-medium text-red-600 hover:text-red-700 hover:underline">
                                                         Delete
                                                     </button>
 
-                                                    {{-- Alert Pop up --}}
+                                                        {{-- Alert Pop up --}}
                                                     <div x-show="open" x-transition
-                                                        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-                                                        style="display: none;">
+                                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+                                                            style="display: none;">
 
                                                         <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
 
@@ -107,28 +114,22 @@
                                                             <h2 class="text-lg font-semibold text-slate-800">
                                                                 Delete Barangay {{ $barangay->name }}
                                                             </h2>
-
                                                             {{-- Message --}}
                                                             <p class="mt-2 text-sm text-slate-600">
                                                                 Are you sure you want to delete this barangay?
                                                                 This action cannot be undone.
                                                             </p>
-
                                                             {{-- Actions --}}
                                                             <div class="mt-6 flex justify-end gap-3">
-
                                                                 <button type="button" @click="open = false"
                                                                     class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
                                                                     Cancel
                                                                 </button>
-
                                                                 <button type="submit"
                                                                     class="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">
                                                                     Delete
                                                                 </button>
-
                                                             </div>
-
                                                         </div>
                                                     </div>
                                                 </form>
